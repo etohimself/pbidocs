@@ -53,9 +53,9 @@
    ```m
    let
        metadata = AnalysisServices.Databases(
-           "127.0.0.1:58860", 
+           "127.0.0.1:YOUR_SSAS_PORT_HERE", 
            [ Implementation = "2.0", TypedMeasureColumns = true ]
-       ){[Name="1ca2eb63-e90e-42ee-9ece-c84d78539f45"]}[Data]{[Id="Model"]}[Data]{[Id="Model"]}[Data],
+       ){[Name="_YOUR_DATABASE_UUID_HERE_"]}[Data]{[Id="Model"]}[Data]{[Id="Model"]}[Data],
    
        RawDimensions = Cube.Dimensions(metadata),
    
