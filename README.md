@@ -36,7 +36,7 @@
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/etohimself/powerbi-docs.git
+   git clone https://github.com/etohimself/pbidocs
    cd powerbi-docs
    ``` 
 
