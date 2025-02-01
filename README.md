@@ -37,7 +37,7 @@
 
    ```bash
    git clone https://github.com/etohimself/pbidocs
-   cd powerbi-docs
+   cd pbidocs
    ``` 
 
 2. **Locate Your SSAS Port and Database ID:**
