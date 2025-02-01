@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Power BI Docs (Enhanced Syntax &amp; Caret Alignment)</title>
+    <style>
+      /* -------------------------------------------
+       BASIC RESET & LAYOUT
+    ------------------------------------------- */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        color: #333;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      /* -------------------------------------------
+       WELCOME SCREEN
+    ------------------------------------------- */
+      #welcome-screen {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #fafafa;
+      }
+      .welcome-container {
+        text-align: center;
+      }
+      .welcome-container h1 {
+        font-size: 24px;
+        color: #0072c6;
+        margin-bottom: 16px;
+      }
+      .welcome-buttons {
+        margin-top: 24px;
+      }
+      .welcome-button {
+        font-size: 16px;
+        padding: 10px 20px;
+        margin: 0 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        background-color: #0072c6;
+        color: #fff;
+      }
+      .welcome-button:hover {
+        background-color: #005b9e;
+      }
+      /* -------------------------------------------
+       MODAL OVERLAY
+    ------------------------------------------- */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+      }
+      .modal {
+        background: #fff;
+        padding: 20px;
+        border-radius: 6px;
+        width: 500px;
+        max-width: 95%;
+        position: relative;
+      }
+      .modal-header {
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: #0072c6;
+      }
+      .modal textarea {
+        width: 100%;
+        height: 150px;
+        font-family: monospace;
+        margin-bottom: 12px;
+      }
+      .modal-buttons {
+        text-align: right;
+      }
+      .modal-buttons button {
+        margin-left: 8px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .btn-cancel {
+        background-color: #aaa;
+        color: #fff;
+      }
+      .btn-submit {
+        background-color: #0072c6;
+        color: #fff;
+      }
+      /* -------------------------------------------
+       EDIT DESCRIPTION COMBO EDITOR
+         - The highlight and the textarea now share the same padding
+           and font settings so that the caret is aligned.
+    ------------------------------------------- */
+      .edit-description-container {
+        position: relative;
+        width: 100%;
+        min-height: 80px;
+        margin-bottom: 12px;
+      }
+      .edit-description-highlight {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 4px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: monospace;
+        font-size: 14px;
+        color: black;
+        pointer-events: none;
+      }
+      .edit-description-highlight a {
+        color: #0c5db3;
+        text-decoration: underline;
+        pointer-events: none;
+      }
+      .edit-description-textarea {
+        position: relative;
+        width: 100%;
+        background: transparent;
+        color: transparent;
+        caret-color: black;
+        border: 1px solid #ccc;
+        padding: 4px;
+        resize: vertical;
+        font-family: monospace;
+        font-size: 14px;
+        z-index: 1;
+      }
+      /* -------------------------------------------
+       EDIT FORMULA COMBO EDITOR
+         - Both the textarea and its highlighted preview now use 
+           the same font (Consolas) at 14px with matching padding.
+    ------------------------------------------- */
+      .edit-formula-container {
+        position: relative;
+        width: 100%;
+        min-height: 80px;
+        margin-bottom: 12px;
+      }
+      .edit-formula-highlight {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 4px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+        font-size: 14px;
+        pointer-events: none;
+      }
+      .edit-formula-textarea {
+        position: relative;
+        width: 100%;
+        background: transparent;
+        color: transparent;
+        caret-color: black;
+        border: 1px solid #ccc;
+        padding: 4px;
+        resize: vertical;
+        font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+        font-size: 14px;
+        z-index: 1;
+      }
+      /* -------------------------------------------
+       APP CONTAINER
+    ------------------------------------------- */
+      #app-container {
+        flex: 1;
+        display: none;
+      }
+      .app-flex {
+        display: flex;
+        width: 100%;
+        height: 100%;
+      }
+      /* -------------------------------------------
+       SIDEBAR
+    ------------------------------------------- */
+      .sidebar {
+        width: 280px;
+        background-color: #f8f9fa;
+        border-right: 1px solid #ddd;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+      .sidebar-top {
+        background-color: #0072c6;
+        padding: 16px;
+      }
+      .sidebar-top h1 {
+        color: #fff;
+        font-size: 20px;
+        margin-bottom: 8px;
+      }
+      .search-box {
+        width: 100%;
+        padding: 6px;
+        font-size: 14px;
+        border: none;
+        border-radius: 4px;
+        outline: none;
+      }
+      .nav-container {
+        flex: 1;
+        overflow-y: auto;
+        padding-bottom: 80px;
+      }
+      .nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        padding: 8px 16px;
+        user-select: none;
+        transition: background-color 0.2s;
+        border-bottom: 1px solid #eee;
+      }
+      .nav-item:hover {
+        background-color: #f0f0f0;
+      }
+      .toggle-icon {
+        margin-right: 8px;
+        font-weight: bold;
+        color: #666;
+        width: 20px;
+        text-align: center;
+      }
+      .item-label {
+        flex: 1;
+      }
+      .children {
+        display: none;
+        margin-left: 20px;
+        list-style: none;
+        padding-left: 0;
+      }
+      .expanded > .toggle-icon::before {
+        content: "−";
+      }
+      .collapsed > .toggle-icon::before {
+        content: "+";
+      }
+      .nav-item.expanded + .children {
+        display: block;
+      }
+      .selected {
+        background-color: #e7f1ff;
+        font-weight: bold;
+      }
+      /* -------------------------------------------
+       Pinned Container in Sidebar
+    ------------------------------------------- */
+      .sidebar-bottom {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-top: 1px solid #ddd;
+        background-color: #f8f9fa;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 10;
+      }
+      .edit-data-button,
+      .export-button {
+        width: 100%;
+        cursor: pointer;
+        font-size: 14px;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 16px;
+        outline: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .edit-data-button:hover,
+      .export-button:hover {
+        opacity: 0.85;
+      }
+      .edit-data-button .icon,
+      .export-button .icon {
+        margin-right: 6px;
+        font-size: 16px;
+      }
+      .edit-data-button {
+        background-color: #0072c6;
+      }
+      .export-button {
+        background-color: #d9534f;
+      }
+      /* -------------------------------------------
+       MAIN CONTENT
+    ------------------------------------------- */
+      .main {
+        flex: 1;
+        overflow-y: auto;
+        background-color: #fafafa;
+        padding: 40px 20px;
+        display: flex;
+        justify-content: center;
+      }
+      .main-content {
+        width: 100%;
+        max-width: 900px;
+        background: #fff;
+        padding: 30px 40px;
+        margin-bottom: 40px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .main-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 24px;
+      }
+      .main-header h2 {
+        font-size: 26px;
+        color: #0072c6;
+        margin: 0;
+      }
+      .edit-button {
+        cursor: pointer;
+        font-size: 14px;
+        color: #fff;
+        background-color: #0072c6;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 16px;
+        outline: none;
+      }
+      .edit-button:hover {
+        background-color: #005b9e;
+      }
+      .description {
+        margin-bottom: 16px;
+        line-height: 1.5;
+      }
+      .code-block {
+        margin-bottom: 24px;
+        display: none;
+      }
+      .code-block pre {
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        padding: 1em;
+        overflow: auto;
+      }
+      #main-toc {
+        margin-top: 20px;
+      }
+      #main-toc h3 {
+        margin-bottom: 12px;
+        font-size: 18px;
+        color: #0072c6;
+      }
+      .toc-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 24px;
+      }
+      .toc-table thead th {
+        background-color: #f0f0f0;
+        font-weight: bold;
+        padding: 8px;
+        border-bottom: 2px solid #ccc;
+        text-align: left;
+      }
+      .toc-table tbody tr {
+        border-bottom: 1px solid #ddd;
+      }
+      .toc-table td {
+        padding: 8px;
+        vertical-align: top;
+      }
+      /* -------------------------------------------
+       PRISM THEME for DAX (Updated Palette)
+    ------------------------------------------- */
+      .token.comment {
+        color: #008000; /* green */
+        font-style: italic;
+      }
+      .token.string {
+        color: #a31515; /* dark red */
+      }
+      .token.keyword {
+        color: #0000ff; /* blue */
+      }
+      .token.function {
+        color: #800080; /* purple */
+      }
+      .token.operator {
+        color: #000000;
+      }
+      .token.number,
+      .token.boolean {
+        color: #008080; /* teal */
+      }
+      .token.punctuation {
+        color: #000000;
+      }
+      /* -------------------------------------------
+       SLASH MODAL (Feature 2)
+    ------------------------------------------- */
+      .slash-modal {
+        position: absolute;
+        background: #fff;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        padding: 8px;
+        z-index: 1000;
+        width: 300px;
+      }
+      .slash-modal input {
+        width: 100%;
+        padding: 4px;
+        margin-bottom: 4px;
+        box-sizing: border-box;
+      }
+      .slash-modal ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 150px;
+        overflow-y: auto;
+      }
+      .slash-modal li {
+        padding: 4px;
+        cursor: pointer;
+      }
+      .slash-modal li:hover,
+      .slash-modal li.selected {
+        background-color: #e7f1ff;
+      }
+    </style>
+
+    <!-- Global variable to control editability -->
+    <script>
+      // By default the document is editable.
+      var isDocumentEditable = true;
+    </script>
+  </head>
+  <body>
+    <!-- WELCOME SCREEN -->
+    <div id="welcome-screen">
+      <div class="welcome-container">
+        <h1>Welcome to Power BI Docs!</h1>
+        <p>Select an option to start:</p>
+        <div class="welcome-buttons">
+          <button class="welcome-button" id="btn-create-data">
+            Create from Data
+          </button>
+          <button class="welcome-button" id="btn-import-existing">
+            Import from Existing Documentation
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREATE-FROM-DATA MODAL -->
+    <div class="modal-overlay" id="create-data-modal">
+      <div class="modal">
+        <div class="modal-header">Tab-Separated Data</div>
+        <p style="font-size: 13px; margin-bottom: 8px">
+          Format: Name &emsp; Parent &emsp; Type<br />
+          (e.g. "Agent Handled Calls &emsp; Measures &emsp; Measure")
+        </p>
+        <textarea id="tsv-input"></textarea>
+        <div class="modal-buttons">
+          <button class="btn-cancel" id="btn-cancel-create">Cancel</button>
+          <button class="btn-submit" id="btn-submit-create">Submit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- APP CONTAINER -->
+    <div id="app-container">
+      <div class="app-flex">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+          <div class="sidebar-top">
+            <h1>Power BI Documentation</h1>
+            <input
+              type="text"
+              id="searchBox"
+              class="search-box"
+              placeholder="Search..."
+            />
+          </div>
+          <div class="nav-container">
+            <ul id="nav" class="nav"></ul>
+          </div>
+          <div class="sidebar-bottom">
+            <button class="edit-data-button" id="edit-data-button">
+              <span class="icon">✎</span>Edit Data
+            </button>
+            <button class="export-button" id="export-button">
+              <span class="icon">⎋</span>Export Docs
+            </button>
+          </div>
+        </div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="main">
+          <div class="main-content">
+            <div class="main-header">
+              <h2 id="main-title">Welcome</h2>
+              <button class="edit-button" id="edit-button">Edit</button>
+            </div>
+            <div class="description" id="main-description">
+              Select an item from the sidebar to see details.
+            </div>
+            <div class="code-block" id="main-code-block">
+              <pre><code id="main-code" class="language-dax"></code></pre>
+            </div>
+            <div id="main-toc">
+              <h3>Contents</h3>
+              <table class="toc-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody id="main-toc-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT ITEM MODAL -->
+    <div class="modal-overlay" id="modal-overlay-edit">
+      <div class="modal" id="edit-modal">
+        <div class="modal-header">Edit Item</div>
+        <div class="modal-field">
+          <label for="edit-name">Name</label>
+          <input type="text" id="edit-name" />
+        </div>
+        <div class="modal-field">
+          <label for="edit-description">Description</label>
+          <div
+            id="edit-description-container"
+            class="edit-description-container"
+          >
+            <div
+              id="edit-description-highlight"
+              class="edit-description-highlight"
+            ></div>
+            <textarea
+              id="edit-description"
+              class="edit-description-textarea"
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-field">
+          <label for="edit-formula">Formula</label>
+          <div id="edit-formula-container" class="edit-formula-container">
+            <div
+              id="edit-formula-highlight"
+              class="edit-formula-highlight"
+            ></div>
+            <textarea
+              id="edit-formula"
+              class="edit-formula-textarea"
+              rows="4"
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-buttons">
+          <button class="btn-cancel" id="btn-cancel-edit">Cancel</button>
+          <button class="btn-save" id="btn-save-edit">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slash Lookup Modal (Feature 2) -->
+    <div id="slash-modal" class="slash-modal" style="display: none">
+      <input type="text" id="slash-search" placeholder="Search..." />
+      <ul id="slash-results"></ul>
+    </div>
+
+    <!-- Hidden file input for importing existing HTML docs -->
+    <input type="file" id="file-input" accept=".html" style="display: none" />
+
+    <script>
+      /***********************************************************************
+       * 0. PRISM-LIKE CODE HIGHLIGHTING (DAX Grammar & Updated Palette)
+       ***********************************************************************/
+      var Prism = {
+        manual: true,
+        languages: {
+          dax: {
+            comment: /\-\-[^\n]*/g,
+            string: /("[^"]*")|('[^']*')/g,
+            keyword:
+              /\b(?:CALCULATE|SUM|ALL|AVERAGEX|RELATED|FILTER|VALUES|DISTINCT|SUMX|COUNTROWS|MAX|MIN)\b/gi,
+            function: /\b[A-Z_][A-Z0-9_]*(?=\s*\()/gi,
+            boolean: /\b(?:TRUE|FALSE)\b/gi,
+            number: /\b\d+(?:\.\d+)?\b/g,
+            operator: /[\+\-\*\/=<>]|<>|&&|\|\|/g,
+            punctuation: /[()\[\],]/g,
+          },
+        },
+        highlightAll: function () {
+          var codeBlocks = document.querySelectorAll(
+            'code[class*="language-"]'
+          );
+          for (var i = 0; i < codeBlocks.length; i++) {
+            Prism.highlightElement(codeBlocks[i]);
+          }
+        },
+        highlightElement: function (el) {
+          var langMatch = el.className.match(/language-(\w+)/);
+          var lang = langMatch && langMatch[1] ? langMatch[1] : "dax";
+          var grammar = Prism.languages[lang];
+          if (!grammar) return;
+          var text = el.textContent;
+          var tokens = Prism.tokenizeSinglePass(text, grammar);
+          el.innerHTML = Prism.stringify(tokens);
+        },
+        tokenizeSinglePass: function (text, grammar) {
+          var matches = [];
+          for (var tokenName in grammar) {
+            var pattern = grammar[tokenName];
+            var patterns = Array.isArray(pattern) ? pattern : [pattern];
+            patterns.forEach(function (pat) {
+              var flags = pat.flags || "";
+              if (!flags.includes("g")) flags += "g";
+              var re = new RegExp(pat.source, flags);
+              var m;
+              while ((m = re.exec(text)) !== null) {
+                matches.push({
+                  type: tokenName,
+                  content: m[0],
+                  start: m.index,
+                  end: m.index + m[0].length,
+                });
+              }
+            });
+          }
+          matches.sort((a, b) => a.start - b.start);
+          var tokens = [];
+          var lastPos = 0;
+          for (var i = 0; i < matches.length; i++) {
+            var mt = matches[i];
+            if (mt.start < lastPos) continue;
+            if (mt.start > lastPos) {
+              tokens.push({
+                type: "plain",
+                content: text.slice(lastPos, mt.start),
+              });
+            }
+            tokens.push({ type: mt.type, content: mt.content });
+            lastPos = mt.end;
+          }
+          if (lastPos < text.length) {
+            tokens.push({ type: "plain", content: text.slice(lastPos) });
+          }
+          return tokens;
+        },
+        stringify: function (tokens) {
+          if (!Array.isArray(tokens)) return tokens.content;
+          var html = "";
+          tokens.forEach(function (t) {
+            if (t.type === "plain") {
+              html += t.content;
+            } else {
+              html +=
+                '<span class="token ' + t.type + '">' + t.content + "</span>";
+            }
+          });
+          return html;
+        },
+      };
+
+      /***********************************************************************
+       * 1. DATA & STATE
+       ***********************************************************************/
+      if (isDocumentEditable) {
+        var docData = [];
+      }
+
+      let currentlySelectedLi = null;
+      let currentItem = null;
+      let itemMap = {};
+      let currentSlashStart = null;
+
+      /* DOM elements */
+      const welcomeScreen = document.getElementById("welcome-screen");
+      const createDataModal = document.getElementById("create-data-modal");
+      const tsvInput = document.getElementById("tsv-input");
+      const btnCreateData = document.getElementById("btn-create-data");
+      const btnImportExisting = document.getElementById("btn-import-existing");
+      const btnCancelCreate = document.getElementById("btn-cancel-create");
+      const btnSubmitCreate = document.getElementById("btn-submit-create");
+      const appContainer = document.getElementById("app-container");
+      const navContainer = document.getElementById("nav");
+      const searchBox = document.getElementById("searchBox");
+      const mainTitleEl = document.getElementById("main-title");
+      const mainDescEl = document.getElementById("main-description");
+      const mainCodeBlock = document.getElementById("main-code-block");
+      const mainCodeEl = document.getElementById("main-code");
+      const mainTOC = document.getElementById("main-toc");
+      const mainTOCBody = document.getElementById("main-toc-body");
+      const editButton = document.getElementById("edit-button");
+      const editDataButton = document.getElementById("edit-data-button");
+      const exportButton = document.getElementById("export-button");
+      const modalOverlayEdit = document.getElementById("modal-overlay-edit");
+      const editModal = document.getElementById("edit-modal");
+      const editNameInput = document.getElementById("edit-name");
+      const editDescTextarea = document.getElementById("edit-description");
+      const editDescHighlight = document.getElementById(
+        "edit-description-highlight"
+      );
+      const editFormulaTextarea = document.getElementById("edit-formula");
+      const editFormulaHighlight = document.getElementById(
+        "edit-formula-highlight"
+      );
+      const btnCancelEdit = document.getElementById("btn-cancel-edit");
+      const btnSaveEdit = document.getElementById("btn-save-edit");
+      const fileInput = document.getElementById("file-input");
+      const slashModal = document.getElementById("slash-modal");
+      const slashSearch = document.getElementById("slash-search");
+      const slashResults = document.getElementById("slash-results");
+
+      /***********************************************************************
+       * 2. HELPER: HTML & REGEX ESCAPING
+       ***********************************************************************/
+      function escapeHtmlAttr(str) {
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/"/g, "&quot;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+      function escapeHtmlText(str) {
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+      function escapeRegex(s) {
+        return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      }
+
+      /***********************************************************************
+       * 3. NORMALIZE STRAY CHARACTERS
+       ***********************************************************************/
+      function normalizeDimensionArtifacts(txt) {
+        return txt.replace(
+          /([A-Za-z0-9_]+)">\1\[[A-Za-z0-9_]+\]/g,
+          (fullMatch, grp1) => {
+            const secondTblPos = fullMatch.indexOf(grp1, 1);
+            const bracketPos = fullMatch.indexOf("[", secondTblPos);
+            const bracketed = fullMatch.substring(bracketPos);
+            return grp1 + bracketed;
+          }
+        );
+      }
+
+      /***********************************************************************
+       * 4. WELCOME SCREEN & IMPORT
+       ***********************************************************************/
+      if (btnCreateData) {
+        btnCreateData.addEventListener("click", () => {
+          if (!isDocumentEditable) return;
+          tsvInput.value = "";
+          createDataModal.style.display = "flex";
+        });
+      }
+      if (btnImportExisting) {
+        btnImportExisting.addEventListener("click", () => {
+          if (!isDocumentEditable) return;
+          fileInput.value = "";
+          fileInput.click();
+        });
+      }
+      if (fileInput) {
+        fileInput.addEventListener("change", handleImportFile);
+      }
+      if (btnCancelCreate) {
+        btnCancelCreate.addEventListener("click", () => {
+          if (!isDocumentEditable) return;
+          createDataModal.style.display = "none";
+        });
+      }
+      if (btnSubmitCreate) {
+        btnSubmitCreate.addEventListener("click", () => {
+          if (!isDocumentEditable) return;
+          const rawText = tsvInput.value.trim();
+          if (!rawText) {
+            alert("No data pasted!");
+            return;
+          }
+          if (welcomeScreen.style.display !== "none") {
+            docData = buildDocDataFromTSV(rawText, null);
+            createDataModal.style.display = "none";
+            welcomeScreen.style.display = "none";
+            appContainer.style.display = "block";
+            buildNavigation();
+            buildItemMap(docData);
+            selectNavItemFromLabel("Home");
+          } else {
+            const oldDoc = docData;
+            docData = buildDocDataFromTSV(rawText, oldDoc);
+            createDataModal.style.display = "none";
+            buildNavigation();
+            buildItemMap(docData);
+            selectNavItemFromLabel("Home");
+          }
+        });
+      }
+
+      function handleImportFile() {
+        const file = fileInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const fileText = e.target.result;
+          const docDataParsed = extractDocDataFromHtml(fileText);
+          if (!docDataParsed) {
+            alert("Could not parse docData from the selected file!");
+            return;
+          }
+          docData = docDataParsed;
+          welcomeScreen.style.display = "none";
+          appContainer.style.display = "block";
+          buildNavigation();
+          buildItemMap(docData);
+          selectNavItemFromLabel("Home");
+        };
+        reader.readAsText(file);
+      }
+      // Note: We replaced the /s flag with [\s\S] so that dot matches newlines
+      function extractDocDataFromHtml(html) {
+        console.log(html);
+        const re = /(?:var\s+)?docData\s*=\s*(\[[\s\S]*?\])\s*;/;
+        const match = re.exec(html);
+
+        if (!match) return null;
+
+        try {
+          // Use match[1] to get only the JSON array string
+          const dataStr = match[1];
+          return JSON.parse(dataStr);
+        } catch (e) {
+          console.error("Failed to parse docData:", e);
+          return null;
+        }
+      }
+
+      /***********************************************************************
+       * 5. BUILD DOC DATA
+       ***********************************************************************/
+      function buildDocDataFromTSV(tsv, oldDocData) {
+        const lines = tsv
+          .split("\n")
+          .map((l) => l.trim())
+          .filter((l) => l);
+        let startIndex = 0;
+        if (lines.length && lines[0].toLowerCase().includes("parent")) {
+          startIndex = 1;
+        }
+        const homeItem = {
+          label: "Home",
+          type: "home",
+          description: oldDocData
+            ? getOldItemDescFormula(oldDocData, "home", "Home", null)
+                .description
+            : "Welcome home page. Edit me!",
+          formula: null,
+          children: [],
+        };
+        const measuresCat = {
+          label: "Measures",
+          type: "category",
+          description: oldDocData
+            ? getOldItemDescFormula(oldDocData, "category", "Measures", null)
+                .description
+            : "Automatically generated measures.",
+          formula: null,
+          children: [],
+        };
+        const tablesCat = {
+          label: "Tables",
+          type: "category",
+          description: oldDocData
+            ? getOldItemDescFormula(oldDocData, "category", "Tables", null)
+                .description
+            : "Automatically generated tables.",
+          formula: null,
+          children: [],
+        };
+        const newDocData = [homeItem, measuresCat, tablesCat];
+        const oldMap = oldDocData ? docDataToMap(oldDocData) : {};
+        const measuresMap = {};
+        const tablesMap = {};
+        const dimensionSets = {};
+        function ensureDimSet(tbl) {
+          if (!dimensionSets[tbl]) dimensionSets[tbl] = new Set();
+        }
+        const uniqueKeys = new Set();
+        for (let i = startIndex; i < lines.length; i++) {
+          const parts = lines[i].split("\t").map((x) => x.trim());
+          if (parts.length < 3) continue;
+          const rawName = parts[0];
+          const rawParent = parts[1];
+          const rawType = parts[2].toLowerCase();
+          const lineKey =
+            rawType +
+            "||" +
+            rawName.toLowerCase() +
+            "||" +
+            rawParent.toLowerCase();
+          if (uniqueKeys.has(lineKey)) continue;
+          uniqueKeys.add(lineKey);
+          if (rawType === "measure" && rawParent.toLowerCase() === "measures") {
+            if (!measuresMap[rawName]) {
+              const oldItem = oldMap["measure:" + rawName + ":measures"];
+              if (oldItem) {
+                measuresMap[rawName] = oldItem;
+              } else {
+                measuresMap[rawName] = {
+                  label: rawName,
+                  type: "measure",
+                  description: "Dummy description for " + rawName,
+                  formula:
+                    "CALCULATE(\n  SUM(Fact_Table[" +
+                    rawName.replace(/\s/g, "_") +
+                    "]),\n  ALL()\n)",
+                  children: [],
+                };
+              }
+              measuresCat.children.push(measuresMap[rawName]);
+            }
+          } else if (
+            rawType === "table" &&
+            rawParent.toLowerCase() === "tables"
+          ) {
+            if (!tablesMap[rawName]) {
+              const oldItem = oldMap["table:" + rawName + ":tables"];
+              if (oldItem) {
+                tablesMap[rawName] = oldItem;
+              } else {
+                tablesMap[rawName] = {
+                  label: rawName,
+                  type: "table",
+                  description: "Dummy description for " + rawName,
+                  formula: rawName + " (A standard table).",
+                  children: [],
+                };
+              }
+              ensureDimSet(rawName);
+              tablesCat.children.push(tablesMap[rawName]);
+            }
+          } else if (rawType === "dimension") {
+            const parentTbl = rawParent;
+            if (!tablesMap[parentTbl]) {
+              const oldTbl = oldMap["table:" + parentTbl + ":tables"];
+              if (oldTbl) {
+                tablesMap[parentTbl] = oldTbl;
+              } else {
+                tablesMap[parentTbl] = {
+                  label: parentTbl,
+                  type: "table",
+                  description: "Auto-created table for " + parentTbl,
+                  formula: parentTbl + " (A standard table).",
+                  children: [],
+                };
+              }
+              ensureDimSet(parentTbl);
+              tablesCat.children.push(tablesMap[parentTbl]);
+            }
+            ensureDimSet(parentTbl);
+            const dimKeyLower = rawName.toLowerCase();
+            if (!dimensionSets[parentTbl].has(dimKeyLower)) {
+              const oldDim = oldMap["dimension:" + rawName + ":" + parentTbl];
+              if (oldDim) {
+                tablesMap[parentTbl].children.push(oldDim);
+              } else {
+                tablesMap[parentTbl].children.push({
+                  label: rawName,
+                  type: "dimension",
+                  description: "Dummy description for " + rawName,
+                  formula:
+                    "RELATED(" +
+                    parentTbl +
+                    "[" +
+                    rawName.replace(/\s/g, "_") +
+                    "])",
+                  children: [],
+                });
+              }
+              dimensionSets[parentTbl].add(dimKeyLower);
+            }
+          }
+        }
+        return newDocData;
+      }
+      function docDataToMap(docArr) {
+        let map = {};
+        function walk(items, parentLabel) {
+          items.forEach((it) => {
+            let key = "";
+            if (it.type === "home") {
+              key = "home:Home:null";
+            } else if (it.type === "category") {
+              key = "category:" + it.label + ":null";
+            } else if (it.type === "measure") {
+              key = "measure:" + it.label + ":measures";
+            } else if (it.type === "table") {
+              key = "table:" + it.label + ":tables";
+            } else if (it.type === "dimension") {
+              key = "dimension:" + it.label + ":" + (parentLabel || "Unknown");
+            } else {
+              key = it.type + ":" + it.label + ":" + (parentLabel || "none");
+            }
+            map[key] = it;
+            if (it.type === "table") {
+              walk(it.children || [], it.label);
+            } else {
+              walk(it.children || [], parentLabel);
+            }
+          });
+        }
+        walk(docArr, null);
+        return map;
+      }
+      function getOldItemDescFormula(oldDocData, type, label, parent) {
+        const m = docDataToMap(oldDocData);
+        let key = "";
+        if (type === "home") {
+          key = "home:Home:null";
+        } else if (type === "category") {
+          key = "category:" + label + ":null";
+        } else if (type === "measure") {
+          key = "measure:" + label + ":measures";
+        } else if (type === "table") {
+          key = "table:" + label + ":tables";
+        } else if (type === "dimension") {
+          key = "dimension:" + label + ":" + (parent || "Unknown");
+        } else {
+          return { description: "", formula: null };
+        }
+        if (m[key]) {
+          return {
+            description: m[key].description,
+            formula: m[key].formula,
+          };
+        }
+        return { description: "", formula: null };
+      }
+
+      /***********************************************************************
+       * 6. BUILD NAVIGATION, SELECT & UPDATE
+       ***********************************************************************/
+      function buildNavigation() {
+        navContainer.innerHTML = "";
+        buildNav(docData, navContainer);
+      }
+      function buildNav(items, parentEl) {
+        items.forEach((item) => {
+          const li = document.createElement("li");
+          li.className = "nav-item collapsed";
+          const toggleIcon = document.createElement("span");
+          toggleIcon.className = "toggle-icon";
+          if (!item.children || !item.children.length) {
+            toggleIcon.style.visibility = "hidden";
+          }
+          const labelSpan = document.createElement("span");
+          labelSpan.className = "item-label";
+          labelSpan.textContent = item.label;
+          li.addEventListener("click", (ev) => {
+            if (ev.target === toggleIcon) {
+              li.classList.toggle("expanded");
+              li.classList.toggle("collapsed");
+              ev.stopPropagation();
+              return;
+            }
+            selectNavItem(li, item);
+            ev.stopPropagation();
+          });
+          li.appendChild(toggleIcon);
+          li.appendChild(labelSpan);
+          parentEl.appendChild(li);
+          if (item.children && item.children.length > 0) {
+            const ul = document.createElement("ul");
+            ul.className = "children";
+            buildNav(item.children, ul);
+            parentEl.appendChild(ul);
+          }
+        });
+      }
+      function selectNavItem(li, item) {
+        if (currentlySelectedLi) {
+          currentlySelectedLi.classList.remove("selected");
+        }
+        li.classList.add("selected");
+        currentlySelectedLi = li;
+        currentItem = item;
+        updateContent(item);
+      }
+      function selectNavItemFromLabel(label) {
+        const allLis = navContainer.querySelectorAll(".nav-item");
+        for (let li of allLis) {
+          const lbl = li.querySelector(".item-label");
+          if (lbl && lbl.textContent === label) {
+            li.click();
+            break;
+          }
+        }
+      }
+      function buildItemMap(arr) {
+        itemMap = {};
+        function walk(items, parentLabel) {
+          items.forEach((it) => {
+            let key = "";
+            if (it.type === "home") {
+              key = "home:Home:null";
+            } else if (it.type === "category") {
+              key = "category:" + it.label + ":null";
+            } else if (it.type === "measure") {
+              key = "measure:" + it.label + ":measures";
+            } else if (it.type === "table") {
+              key = "table:" + it.label + ":tables";
+            } else if (it.type === "dimension") {
+              key = "dimension:" + it.label + ":" + (parentLabel || "Unknown");
+            } else {
+              key = it.type + ":" + it.label + ":" + (parentLabel || "none");
+            }
+            it.__key = key;
+            itemMap[key] = it;
+            if (it.type === "table") {
+              walk(it.children || [], it.label);
+            } else {
+              walk(it.children || [], parentLabel);
+            }
+          });
+        }
+        walk(arr, null);
+      }
+
+      /***********************************************************************
+       * 7. autoLinkReferences (for description & formulas)
+       ***********************************************************************/
+      function autoLinkReferences(text, currentKey) {
+        let output = text;
+        // Dimension pass: TableName[Dimension]
+        const dimRegex = /(\b[A-Za-z0-9_]+)\s*\[\s*([A-Za-z0-9_ ]+)\s*\]/g;
+        output = replaceWithCallback(output, dimRegex, (full, tbl, dim) => {
+          const dimensionKey = "dimension:" + dim + ":" + tbl;
+          if (dimensionKey === currentKey) return full;
+          const dimensionItem = itemMap[dimensionKey];
+          if (dimensionItem) {
+            const safeKey = escapeHtmlAttr(dimensionKey);
+            const safeMatch = escapeHtmlText(full);
+            return (
+              '<a href="#" class="doc-link" data-ref="' +
+              safeKey +
+              '">' +
+              safeMatch +
+              "</a>"
+            );
+          }
+          return full;
+        });
+        // Measure pass: [Measure]
+        const measureRegex = /\[\s*([^\]]+?)\s*\]/g;
+        output = replaceWithCallback(output, measureRegex, (full, mName) => {
+          mName = mName.trim();
+          const measureKey = "measure:" + mName + ":measures";
+          if (measureKey === currentKey) return full;
+          const measureItem = itemMap[measureKey];
+          if (measureItem) {
+            const safeKey = escapeHtmlAttr(measureKey);
+            const safeMatch = escapeHtmlText(full);
+            return (
+              '<a href="#" class="doc-link" data-ref="' +
+              safeKey +
+              '">' +
+              safeMatch +
+              "</a>"
+            );
+          }
+          return full;
+        });
+        // Temporarily protect existing anchors.
+        let anchors = [];
+        output = output.replace(/<a\b[^>]*>[\s\S]*?<\/a>/g, function (match) {
+          anchors.push(match);
+          return "{{ANCHOR_" + (anchors.length - 1) + "}}";
+        });
+        // Table pass: standalone table names (not followed by '[')
+        const tableRegex = /\b([A-Za-z0-9_]+)\b(?!\s*\[)/g;
+        output = replaceWithCallback(output, tableRegex, (full, tName) => {
+          const tableKey = "table:" + tName + ":tables";
+          if (tableKey === currentKey) return full;
+          const tableItem = itemMap[tableKey];
+          if (tableItem) {
+            const safeKey = escapeHtmlAttr(tableKey);
+            const safeMatch = escapeHtmlText(full);
+            return (
+              '<a href="#" class="doc-link" data-ref="' +
+              safeKey +
+              '">' +
+              safeMatch +
+              "</a>"
+            );
+          }
+          return full;
+        });
+        output = output.replace(
+          /{{ANCHOR_(\d+)}}/g,
+          (match, index) => anchors[index]
+        );
+        return output;
+      }
+      function replaceWithCallback(text, regex, callback) {
+        let result = "";
+        let lastIndex = 0;
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+          result += text.slice(lastIndex, match.index);
+          const replacement = callback.apply(null, match);
+          result += replacement;
+          lastIndex = match.index + match[0].length;
+        }
+        result += text.slice(lastIndex);
+        return result;
+      }
+
+      /***********************************************************************
+       * 8. updateContent (view mode)
+       ***********************************************************************/
+      function updateContent(item) {
+        mainTitleEl.textContent = item.label || "Untitled";
+        let descNorm = normalizeDimensionArtifacts(item.description || "");
+        let formNorm = item.formula
+          ? normalizeDimensionArtifacts(item.formula)
+          : "";
+        mainDescEl.innerHTML = autoLinkReferences(descNorm, item.__key);
+        wireDocLinks(mainDescEl);
+        if (item.formula) {
+          mainCodeBlock.style.display = "block";
+          mainCodeEl.innerHTML = autoLinkReferences(formNorm, item.__key);
+          wireDocLinks(mainCodeEl);
+        } else {
+          mainCodeBlock.style.display = "none";
+          mainCodeEl.innerHTML = "";
+        }
+        Prism.highlightAll();
+        mainTOC.style.display = "none";
+        mainTOCBody.innerHTML = "";
+        if (item.type === "category" || item.type === "table") {
+          mainTOC.style.display = "block";
+          item.children.forEach((ch) => {
+            const tr = document.createElement("tr");
+            const tdN = document.createElement("td");
+            tdN.textContent = ch.label;
+            const tdD = document.createElement("td");
+            tdD.textContent = ch.description || "";
+            tr.appendChild(tdN);
+            tr.appendChild(tdD);
+            mainTOCBody.appendChild(tr);
+          });
+        }
+      }
+      function wireDocLinks(container) {
+        const links = container.querySelectorAll(".doc-link");
+        links.forEach((a) => {
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            const key = a.getAttribute("data-ref");
+            if (key) selectNavItemFromKey(key);
+          });
+        });
+      }
+      function selectNavItemFromKey(uKey) {
+        const theItem = itemMap[uKey];
+        if (!theItem) return;
+        const allLis = navContainer.querySelectorAll(".nav-item");
+        for (let li of allLis) {
+          const lbl = li.querySelector(".item-label");
+          if (lbl && lbl.textContent === theItem.label) {
+            expandParents(li);
+            li.click();
+            break;
+          }
+        }
+      }
+      function expandParents(li) {
+        let p = li.parentElement;
+        while (p && p !== navContainer) {
+          if (p.classList.contains("children")) {
+            const prev = p.previousElementSibling;
+            if (prev && prev.classList.contains("nav-item")) {
+              prev.classList.remove("collapsed");
+              prev.classList.add("expanded");
+            }
+          }
+          p = p.parentElement;
+        }
+      }
+
+      /***********************************************************************
+       * 9. EDIT ITEM (Modal) with Enhanced Editors for Description & Formula
+       ***********************************************************************/
+      // --- Description editor update ---
+      function updateDescriptionHighlight() {
+        let raw = editDescTextarea.value;
+        let highlighted = autoLinkReferences(
+          normalizeDimensionArtifacts(raw),
+          currentItem ? currentItem.__key : null
+        );
+        editDescHighlight.innerHTML = highlighted;
+      }
+      // --- Formula editor update using Prism highlighting ---
+      function updateFormulaHighlight() {
+        let raw = editFormulaTextarea.value;
+        let temp = document.createElement("code");
+        temp.className = "language-dax";
+        temp.textContent = raw;
+        Prism.highlightElement(temp);
+        editFormulaHighlight.innerHTML = temp.innerHTML;
+      }
+      // --- Slash command detection in description editor ---
+      function checkForSlashCommand() {
+        let value = editDescTextarea.value;
+        let pos = editDescTextarea.selectionStart;
+        let before = value.slice(0, pos);
+        let match = before.match(/\/(\S*)$/);
+        if (match) {
+          let query = match[1];
+          currentSlashStart = pos - match[0].length;
+          showSlashModal(query);
+        } else {
+          hideSlashModal();
+        }
+      }
+      // --- Show slash modal ---
+      function showSlashModal(query) {
+        let containerRect = document
+          .getElementById("edit-description-container")
+          .getBoundingClientRect();
+        slashModal.style.top = containerRect.bottom + window.scrollY + "px";
+        slashModal.style.left = containerRect.left + window.scrollX + "px";
+        slashModal.style.display = "block";
+        slashSearch.value = query;
+        updateSlashResults(query);
+        slashSearch.focus();
+      }
+      function hideSlashModal() {
+        slashModal.style.display = "none";
+      }
+      function updateSlashResults(query) {
+        slashResults.innerHTML = "";
+        let results = [];
+        Object.values(itemMap).forEach((item) => {
+          if (
+            item.type === "measure" ||
+            item.type === "table" ||
+            item.type === "dimension"
+          ) {
+            let disp = getDisplayTextForItem(item);
+            if (disp.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
+              results.push({ item: item, display: disp });
+            }
+          }
+        });
+        results.sort((a, b) => a.display.localeCompare(b.display));
+        results.forEach((result) => {
+          let li = document.createElement("li");
+          li.textContent = result.display;
+          li.addEventListener("click", () => {
+            insertSlashResult(result.item);
+          });
+          slashResults.appendChild(li);
+        });
+      }
+      function getDisplayTextForItem(item) {
+        if (item.type === "measure") return "[" + item.label + "]";
+        if (item.type === "table") return item.label;
+        if (item.type === "dimension") {
+          let parts = item.__key.split(":"); // format: dimension:DimensionName:ParentTable
+          return parts[2] + "[" + parts[1] + "]";
+        }
+        return item.label;
+      }
+      function insertSlashResult(item) {
+        let value = editDescTextarea.value;
+        let pos = editDescTextarea.selectionStart;
+        let before = value.slice(0, currentSlashStart);
+        let after = value.slice(pos);
+        let insertText = getDisplayTextForItem(item);
+        let newValue = before + insertText + after;
+        editDescTextarea.value = newValue;
+        updateDescriptionHighlight();
+        let newPos = before.length + insertText.length;
+        editDescTextarea.selectionStart = editDescTextarea.selectionEnd =
+          newPos;
+        hideSlashModal();
+        editDescTextarea.focus();
+      }
+      if (editDescTextarea) {
+        editDescTextarea.addEventListener("input", () => {
+          updateDescriptionHighlight();
+          checkForSlashCommand();
+        });
+        editDescTextarea.addEventListener("keyup", (e) => {
+          if (e.key === "Escape") {
+            hideSlashModal();
+          }
+        });
+      }
+      if (editFormulaTextarea) {
+        editFormulaTextarea.addEventListener("input", () => {
+          updateFormulaHighlight();
+        });
+      }
+      if (slashSearch) {
+        slashSearch.addEventListener("input", (e) => {
+          updateSlashResults(e.target.value);
+        });
+        slashSearch.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            hideSlashModal();
+            editDescTextarea.focus();
+          }
+        });
+      }
+      if (editButton) {
+        editButton.addEventListener("click", () => {
+          if (!isDocumentEditable) return;
+          if (!currentItem) return;
+          editNameInput.value = currentItem.label || "";
+          editDescTextarea.value = currentItem.description || "";
+          updateDescriptionHighlight();
+          editFormulaTextarea.value = currentItem.formula || "";
+          updateFormulaHighlight();
+          modalOverlayEdit.style.display = "flex";
+          editDescTextarea.focus();
+        });
+      }
+      if (btnCancelEdit) {
+        btnCancelEdit.addEventListener("click", () => {
+          if (!isDocumentEditable) return;
+          modalOverlayEdit.style.display = "none";
+          hideSlashModal();
+        });
+      }
+      if (btnSaveEdit) {
+        btnSaveEdit.addEventListener("click", () => {
+          if (!isDocumentEditable) return;
+          if (!currentItem) {
+            modalOverlayEdit.style.display = "none";
+            return;
+          }
+          currentItem.label = editNameInput.value.trim();
+          currentItem.description = editDescTextarea.value.trim();
+          currentItem.formula = editFormulaTextarea.value.trim();
+          if (currentlySelectedLi) {
+            let lbl = currentlySelectedLi.querySelector(".item-label");
+            if (lbl) lbl.textContent = currentItem.label;
+          }
+          updateContent(currentItem);
+          buildItemMap(docData);
+          modalOverlayEdit.style.display = "none";
+        });
+      }
+
+      /***********************************************************************
+       * 10. EDIT DATA => Re-export as TSV
+       ***********************************************************************/
+      if (editDataButton) {
+        editDataButton.addEventListener("click", () => {
+          if (!isDocumentEditable) return;
+          const tsv = exportDocDataToTSV(docData);
+          tsvInput.value = tsv;
+          createDataModal.style.display = "flex";
+        });
+      }
+      function exportDocDataToTSV(arr) {
+        let lines = [];
+        function walk(items, parentLabel) {
+          items.forEach((it) => {
+            if (it.type === "home") {
+              // Skip Home
+            } else if (it.type === "category") {
+              if (it.label === "Measures") walk(it.children, "Measures");
+              else if (it.label === "Tables") walk(it.children, "Tables");
+            } else if (it.type === "measure") {
+              lines.push(it.label + "\tMeasures\tMeasure");
+            } else if (it.type === "table") {
+              lines.push(it.label + "\tTables\tTable");
+              walk(it.children, it.label);
+            } else if (it.type === "dimension") {
+              lines.push(it.label + "\t" + (parentLabel || "") + "\tDimension");
+            }
+          });
+        }
+        walk(arr, null);
+        return lines.join("\n");
+      }
+
+      /***********************************************************************
+       * 11. EXPORT BUTTON => Export Read-Only HTML
+       *
+       * When exporting, we insert a snippet that (unless overridden) forces
+       * read-only mode by setting window.isDocumentEditable to false and
+       * hiding editing UI elements. (Navigation and search remain enabled.)
+       ***********************************************************************/
+      if (exportButton) {
+        exportButton.addEventListener("click", () => {
+          if (!isDocumentEditable) return;
+          // Get the current document's HTML as a string.
+          let html = document.documentElement.outerHTML;
+
+          html = html.replace(
+            "var isDocumentEditable = true;",
+            "var isDocumentEditable = false;"
+          );
+
+          // Insert a snippet that disables editing functionality and re-embeds docData.
+          // The snippet checks if window.isDocumentEditable !== true so that editing
+          // can be re-enabled (for example, via a query parameter or manual edit).
+
+          const embedScript = `\nvar docData = ${JSON.stringify(docData)};`;
+
+          html = html.replace(
+            "<\/script>",
+            "\n" + embedScript + "\n<\/script>"
+          );
+
+          // Create a Blob and download the file.
+          const blob = new Blob([html], { type: "text/html" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "PowerBI-Docs-ReadOnly.html";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        });
+      }
+
+      /***********************************************************************
+       * 12. SEARCH BOX
+       ***********************************************************************/
+      if (searchBox) {
+        searchBox.addEventListener("input", () => {
+          const q = searchBox.value.trim().toLowerCase();
+          filterNav(docData, q);
+        });
+      }
+      function filterNav(items, q) {
+        function matches(it, q) {
+          const labelMatch = it.label.toLowerCase().includes(q);
+          let childMatch = false;
+          if (it.children) {
+            it.children.forEach((c) => {
+              if (matches(c, q)) childMatch = true;
+            });
+          }
+          it._filteredIn = labelMatch || childMatch || q === "";
+          return it._filteredIn;
+        }
+        items.forEach((it) => matches(it, q));
+        navContainer.innerHTML = "";
+        buildFiltered(items, navContainer);
+      }
+      function buildFiltered(arr, parentEl) {
+        arr.forEach((it) => {
+          if (!it._filteredIn) return;
+          const li = document.createElement("li");
+          li.className = "nav-item collapsed";
+          const tIcon = document.createElement("span");
+          tIcon.className = "toggle-icon";
+          if (!it.children || !it.children.length) {
+            tIcon.style.visibility = "hidden";
+          }
+          const lab = document.createElement("span");
+          lab.className = "item-label";
+          lab.textContent = it.label;
+          li.addEventListener("click", (e) => {
+            if (e.target === tIcon) {
+              li.classList.toggle("expanded");
+              li.classList.toggle("collapsed");
+              e.stopPropagation();
+            } else {
+              selectNavItem(li, it);
+              e.stopPropagation();
+            }
+          });
+          li.appendChild(tIcon);
+          li.appendChild(lab);
+          parentEl.appendChild(li);
+          if (it.children && it.children.some((c) => c._filteredIn)) {
+            li.classList.add("expanded");
+            li.classList.remove("collapsed");
+          }
+          if (it.children && it.children.length > 0) {
+            const ul = document.createElement("ul");
+            ul.className = "children";
+            buildFiltered(it.children, ul);
+            if (ul.childNodes.length > 0) {
+              parentEl.appendChild(ul);
+            }
+          }
+        });
+      }
+
+      /***********************************************************************
+       * 13. Disable Editing in Read-Only Mode on DOMContentLoaded
+       ***********************************************************************/
+      function disableEditing() {
+        if (editDataButton) editDataButton.style.display = "none";
+        if (exportButton) exportButton.style.display = "none";
+        if (editButton) editButton.style.display = "none";
+        if (document.getElementById("btn-create-data"))
+          document.getElementById("btn-create-data").style.display = "none";
+        if (document.getElementById("btn-import-existing"))
+          document.getElementById("btn-import-existing").style.display = "none";
+        if (createDataModal) createDataModal.style.display = "none";
+        if (modalOverlayEdit) modalOverlayEdit.style.display = "none";
+        if (document.getElementById("slash-modal"))
+          document.getElementById("slash-modal").style.display = "none";
+        if (welcomeScreen) welcomeScreen.style.display = "none";
+        if (appContainer) appContainer.style.display = "block";
+      }
+      document.addEventListener("DOMContentLoaded", function () {
+        if (!isDocumentEditable) {
+          disableEditing();
+          buildNavigation();
+        }
+      });
+    </script>
+  </body>
+</html>
