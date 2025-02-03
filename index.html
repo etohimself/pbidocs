@@ -2,11 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Power BI Docs (Enhanced Syntax &amp; Caret Alignment)</title>
+    <title>Power BI Docs</title>
     <style>
       /* -------------------------------------------
        BASIC RESET & LAYOUT
-    ------------------------------------------- */
+      ------------------------------------------- */
       * {
         box-sizing: border-box;
         margin: 0;
@@ -22,7 +22,7 @@
       }
       /* -------------------------------------------
        WELCOME SCREEN
-    ------------------------------------------- */
+      ------------------------------------------- */
       #welcome-screen {
         flex: 1;
         display: flex;
@@ -56,7 +56,7 @@
       }
       /* -------------------------------------------
        MODAL OVERLAY
-    ------------------------------------------- */
+      ------------------------------------------- */
       .modal-overlay {
         position: fixed;
         top: 0;
@@ -103,15 +103,14 @@
         background-color: #aaa;
         color: #fff;
       }
-      .btn-submit {
+      .btn-submit,
+      .btn-save {
         background-color: #0072c6;
         color: #fff;
       }
       /* -------------------------------------------
        EDIT DESCRIPTION COMBO EDITOR
-         - The highlight and the textarea now share the same padding
-           and font settings so that the caret is aligned.
-    ------------------------------------------- */
+      ------------------------------------------- */
       .edit-description-container {
         position: relative;
         width: 100%;
@@ -152,9 +151,7 @@
       }
       /* -------------------------------------------
        EDIT FORMULA COMBO EDITOR
-         - Both the textarea and its highlighted preview now use 
-           the same font (Consolas) at 14px with matching padding.
-    ------------------------------------------- */
+      ------------------------------------------- */
       .edit-formula-container {
         position: relative;
         width: 100%;
@@ -189,7 +186,7 @@
       }
       /* -------------------------------------------
        APP CONTAINER
-    ------------------------------------------- */
+      ------------------------------------------- */
       #app-container {
         flex: 1;
         display: none;
@@ -200,19 +197,20 @@
         height: 100%;
       }
       /* -------------------------------------------
-       SIDEBAR
-    ------------------------------------------- */
+       SIDEBAR (MODIFIED FOR SCROLLING & PERCENT HEIGHT)
+      ------------------------------------------- */
       .sidebar {
         width: 280px;
         background-color: #f8f9fa;
         border-right: 1px solid #ddd;
-        position: relative;
         display: flex;
         flex-direction: column;
+        height: 100vh; /* Full viewport height */
       }
       .sidebar-top {
         background-color: #0072c6;
         padding: 16px;
+        flex: 0 0 20%; /* 20% of sidebar height */
       }
       .sidebar-top h1 {
         color: #fff;
@@ -228,9 +226,9 @@
         outline: none;
       }
       .nav-container {
-        flex: 1;
-        overflow-y: auto;
-        padding-bottom: 80px;
+        flex: 0 0 60%; /* 60% of sidebar height */
+        overflow-y: scroll; /* Always show vertical scroll */
+        font-size:13px;
       }
       .nav {
         list-style: none;
@@ -279,20 +277,16 @@
         font-weight: bold;
       }
       /* -------------------------------------------
-       Pinned Container in Sidebar
-    ------------------------------------------- */
+       PINNED CONTAINER IN SIDEBAR (MODIFIED: no absolute positioning, percent height)
+      ------------------------------------------- */
       .sidebar-bottom {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
         border-top: 1px solid #ddd;
         background-color: #f8f9fa;
         padding: 8px;
         display: flex;
         flex-direction: column;
         gap: 8px;
-        z-index: 10;
+        flex: 0 0 20%; /* 20% of sidebar height */
       }
       .edit-data-button,
       .export-button {
@@ -325,7 +319,7 @@
       }
       /* -------------------------------------------
        MAIN CONTENT
-    ------------------------------------------- */
+      ------------------------------------------- */
       .main {
         flex: 1;
         overflow-y: auto;
@@ -333,6 +327,7 @@
         padding: 40px 20px;
         display: flex;
         justify-content: center;
+        font-size:13px;
       }
       .main-content {
         width: 100%;
@@ -341,6 +336,9 @@
         padding: 30px 40px;
         margin-bottom: 40px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
+        max-height: calc(100vh - 80px);
+        font-size:13px;
       }
       .main-header {
         display: flex;
@@ -392,6 +390,7 @@
         width: 100%;
         border-collapse: collapse;
         margin-bottom: 24px;
+        font-size:13px;
       }
       .toc-table thead th {
         background-color: #f0f0f0;
@@ -409,33 +408,33 @@
       }
       /* -------------------------------------------
        PRISM THEME for DAX (Updated Palette)
-    ------------------------------------------- */
+      ------------------------------------------- */
       .token.comment {
-        color: #008000; /* green */
+        color: #008000;
         font-style: italic;
       }
       .token.string {
-        color: #a31515; /* dark red */
+        color: #a31515;
       }
       .token.keyword {
-        color: #0000ff; /* blue */
+        color: #0000ff;
       }
       .token.function {
-        color: #800080; /* purple */
+        color: #800080;
       }
       .token.operator {
         color: #000000;
       }
       .token.number,
       .token.boolean {
-        color: #008080; /* teal */
+        color: #008080;
       }
       .token.punctuation {
         color: #000000;
       }
       /* -------------------------------------------
        SLASH MODAL (Feature 2)
-    ------------------------------------------- */
+      ------------------------------------------- */
       .slash-modal {
         position: absolute;
         background: #fff;
@@ -466,12 +465,194 @@
       .slash-modal li.selected {
         background-color: #e7f1ff;
       }
+      /* -------------------------------------------
+       CHANGELOG STYLES (Version Log)
+      ------------------------------------------- */
+      .changelog-section {
+        margin-top: 20px;
+        padding: 10px 15px;
+        border-top: 1px solid #ddd;
+      }
+      .changelog-section h3 {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 8px;
+      }
+      .changelog-entry {
+        font-size: 12px;
+        margin-bottom: 8px;
+        padding: 6px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        position: relative;
+      }
+      .changelog-entry ul {
+        list-style-position: inside;
+        margin: 0;
+        padding-left: 15px;
+      }
+      .changelog-addition {
+        color: #228b22;
+        font-size: 12px;
+      }
+      .changelog-removal {
+        color: #d9534f;
+        font-size: 12px;
+      }
+      .changelog-update {
+        color: #6c71e7;
+        font-size: 12px;
+      }
+      /* New CSS for changelog header grouping */
+      .changelog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+      .version-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .author-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .version-info {
+        font-weight: bold;
+        font-size: 12px;
+      }
+      /* -------------------------------------------
+       EDIT ICONS
+      ------------------------------------------- */
+      .edit-version-icon,
+      .edit-action-icon,
+      .edit-author-icon {
+        cursor: pointer;
+        font-size: 18px;
+        color: #0072c6;
+      }
+      .edit-action-icon {
+        font-size: 16px;
+        margin-left: 8px;
+      }
+      .changelog-author {
+        font-style: italic;
+        font-size: 12px;
+        color: #555;
+      }
     </style>
 
-    <!-- Global variable to control editability -->
+    <!-- Global variables and scripts (unchanged, except for a few helper functions) -->
     <script>
       // By default the document is editable.
       var isDocumentEditable = true;
+
+      // NEW GLOBALS for grouping edits during a session:
+      // sessionBaseline holds the original document data (with changelog) as imported or last exported.
+      // pendingVersion holds the version number of the new (un-exported) changes.
+      let sessionBaseline = null;
+      let pendingVersion = null;
+
+      // NEW: Flag to indicate whether the document was imported (true) or created from scratch (false)
+      let isImported = false;
+      // NEW: When a document is imported, store the highest (baseline) version number.
+      // (Now stored as a string in semantic format, e.g. "1.0.0")
+      let importedMaxVersion = "1.0.0";
+
+      /***********************************************************************
+       * VERSION HELPER FUNCTIONS (Semantic Versioning)
+       ***********************************************************************/
+      function parseVersion(v) {
+        const parts = v.split(".");
+        return {
+          major: parseInt(parts[0], 10) || 0,
+          minor: parseInt(parts[1], 10) || 0,
+          patch: parseInt(parts[2], 10) || 0,
+        };
+      }
+      function versionToString(ver) {
+        return ver.major + "." + ver.minor + "." + ver.patch;
+      }
+      function incrementVersion(versionStr) {
+        const ver = parseVersion(versionStr);
+        if (ver.patch < 9) {
+          ver.patch++;
+        } else {
+          ver.patch = 0;
+          if (ver.minor < 9) {
+            ver.minor++;
+          } else {
+            ver.minor = 0;
+            ver.major++;
+          }
+        }
+        return versionToString(ver);
+      }
+      function compareVersions(v1, v2) {
+        const ver1 = parseVersion(v1);
+        const ver2 = parseVersion(v2);
+        if (ver1.major !== ver2.major) return ver1.major - ver2.major;
+        if (ver1.minor !== ver2.minor) return ver1.minor - ver2.minor;
+        return ver1.patch - ver2.patch;
+      }
+
+      /***********************************************************************
+       * NEW: Robust TSV parser to support quoted multi‐line fields.
+       * This function splits the given TSV text into an array of rows,
+       * each being an array of fields.
+       ***********************************************************************/
+      function parseTSV(tsv) {
+        const rows = [];
+        let currentRow = [];
+        let currentField = "";
+        let inQuotes = false;
+        for (let i = 0; i < tsv.length; i++) {
+          let c = tsv[i];
+          if (inQuotes) {
+            if (c === '"') {
+              // If the next character is also a quote, add a literal quote.
+              if (i + 1 < tsv.length && tsv[i + 1] === '"') {
+                currentField += '"';
+                i++;
+              } else {
+                inQuotes = false;
+              }
+            } else {
+              currentField += c;
+            }
+          } else {
+            if (c === '"') {
+              inQuotes = true;
+            } else if (c === "\t") {
+              currentRow.push(currentField);
+              currentField = "";
+            } else if (c === "\n" || c === "\r") {
+              // Handle possible \r\n pair
+              if (c === "\r" && tsv[i + 1] === "\n") {
+                i++;
+              }
+              currentRow.push(currentField);
+              rows.push(currentRow);
+              currentRow = [];
+              currentField = "";
+            } else {
+              currentField += c;
+            }
+          }
+        }
+        // Add any remaining field/row.
+        if (currentField !== "" || currentRow.length > 0) {
+          currentRow.push(currentField);
+          rows.push(currentRow);
+        }
+        return rows;
+      }
+
+      // ... (The remainder of the JavaScript remains unchanged except as noted below.)
     </script>
   </head>
   <body>
@@ -496,8 +677,15 @@
       <div class="modal">
         <div class="modal-header">Tab-Separated Data</div>
         <p style="font-size: 13px; margin-bottom: 8px">
-          Format: Name &emsp; Parent &emsp; Type<br />
-          (e.g. "Agent Handled Calls &emsp; Measures &emsp; Measure")
+          Format: Name &emsp; Parent &emsp; Type &emsp; Expression<br />
+          (e.g. <br />
+          <code>Agent Handled Calls &emsp; Measures &emsp; Measure &emsp; </code
+          ><br />
+          <code
+            >Agent Phone Handled Inbound Phone Calls &emsp; Measures &emsp;
+            Measure &emsp; "CALCULATE(SUM(Fact_Calls[Contacts Handled -
+            Incoming]), Fact_Calls[Channel] = ""VOICE"")"</code
+          >)
         </p>
         <textarea id="tsv-input"></textarea>
         <div class="modal-buttons">
@@ -609,6 +797,79 @@
       </div>
     </div>
 
+    <!-- EDIT VERSION MODAL (Version number only) -->
+    <div class="modal-overlay" id="modal-overlay-version">
+      <div class="modal" id="edit-version-modal">
+        <div class="modal-header">Edit Version</div>
+        <div class="modal-field" id="version-field">
+          <label>Version: </label>
+          <input
+            type="number"
+            id="version-major"
+            value="1"
+            style="width: 50px"
+          />
+          .
+          <input
+            type="number"
+            id="version-minor"
+            value="0"
+            style="width: 50px"
+          />
+          .
+          <input
+            type="number"
+            id="version-patch"
+            value="0"
+            style="width: 50px"
+          />
+        </div>
+        <div class="modal-buttons" style="margin-top: 10px">
+          <button class="btn-cancel" id="btn-cancel-version">Cancel</button>
+          <button class="btn-save" id="btn-save-version">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT CHANGELOG ACTION MODAL -->
+    <div class="modal-overlay" id="modal-overlay-action">
+      <div class="modal" id="edit-action-modal">
+        <div class="modal-header">Edit Changelog Action</div>
+        <div class="modal-field">
+          <label>Description:</label>
+          <div style="display: flex; align-items: center">
+            <span
+              id="action-edit-prefix"
+              style="font-weight: bold; margin-right: 4px"
+            ></span>
+            <textarea
+              id="action-edit-text"
+              style="width: 100%; height: 80px"
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-buttons">
+          <button class="btn-cancel" id="btn-cancel-action-edit">Cancel</button>
+          <button class="btn-save" id="btn-save-action-edit">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT AUTHOR MODAL -->
+    <div class="modal-overlay" id="modal-overlay-author">
+      <div class="modal" id="edit-author-modal">
+        <div class="modal-header">Edit Author</div>
+        <div class="modal-field">
+          <label for="author-input">Author Name:</label>
+          <input type="text" id="author-input" value="Unknown" />
+        </div>
+        <div class="modal-buttons" style="margin-top: 10px">
+          <button class="btn-cancel" id="btn-cancel-author">Cancel</button>
+          <button class="btn-save" id="btn-save-author">Save</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Slash Lookup Modal (Feature 2) -->
     <div id="slash-modal" class="slash-modal" style="display: none">
       <input type="text" id="slash-search" placeholder="Search..." />
@@ -715,11 +976,19 @@
       if (isDocumentEditable) {
         var docData = [];
       }
-
       let currentlySelectedLi = null;
       let currentItem = null;
       let itemMap = {};
       let currentSlashStart = null;
+
+      // Globals for version & changelog action editing:
+      let currentHomeItem = null;
+      let currentChangelogIndex = null; // For version edits
+      let currentActionEntryIndex = null; // For changelog action edits
+      let currentActionKey = null;
+      let currentActionTable = null;
+      // NEW: Global for author edit modal
+      let currentAuthorEntryIndex = null;
 
       /* DOM elements */
       const welcomeScreen = document.getElementById("welcome-screen");
@@ -758,6 +1027,38 @@
       const slashModal = document.getElementById("slash-modal");
       const slashSearch = document.getElementById("slash-search");
       const slashResults = document.getElementById("slash-results");
+
+      // New DOM elements for version editing modal
+      const modalOverlayVersion = document.getElementById(
+        "modal-overlay-version"
+      );
+      const editVersionModal = document.getElementById("edit-version-modal");
+      const versionMajorInput = document.getElementById("version-major");
+      const versionMinorInput = document.getElementById("version-minor");
+      const versionPatchInput = document.getElementById("version-patch");
+      const btnCancelVersion = document.getElementById("btn-cancel-version");
+      const btnSaveVersion = document.getElementById("btn-save-version");
+
+      // New DOM elements for changelog action editing modal
+      const modalOverlayAction = document.getElementById(
+        "modal-overlay-action"
+      );
+      const editActionModal = document.getElementById("edit-action-modal");
+      const actionEditPrefix = document.getElementById("action-edit-prefix");
+      const actionEditText = document.getElementById("action-edit-text");
+      const btnCancelActionEdit = document.getElementById(
+        "btn-cancel-action-edit"
+      );
+      const btnSaveActionEdit = document.getElementById("btn-save-action-edit");
+
+      // NEW: DOM elements for author editing modal
+      const modalOverlayAuthor = document.getElementById(
+        "modal-overlay-author"
+      );
+      const editAuthorModal = document.getElementById("edit-author-modal");
+      const authorInput = document.getElementById("author-input");
+      const btnCancelAuthor = document.getElementById("btn-cancel-author");
+      const btnSaveAuthor = document.getElementById("btn-save-author");
 
       /***********************************************************************
        * 2. HELPER: HTML & REGEX ESCAPING
@@ -800,6 +1101,8 @@
       if (btnCreateData) {
         btnCreateData.addEventListener("click", () => {
           if (!isDocumentEditable) return;
+          // When creating from data, mark as NOT imported.
+          isImported = false;
           tsvInput.value = "";
           createDataModal.style.display = "flex";
         });
@@ -807,6 +1110,8 @@
       if (btnImportExisting) {
         btnImportExisting.addEventListener("click", () => {
           if (!isDocumentEditable) return;
+          // When importing, mark as imported.
+          isImported = true;
           fileInput.value = "";
           fileInput.click();
         });
@@ -830,6 +1135,12 @@
           }
           if (welcomeScreen.style.display !== "none") {
             docData = buildDocDataFromTSV(rawText, null);
+            sessionBaseline = JSON.parse(JSON.stringify(docData));
+            pendingVersion = null;
+            // For documents created from scratch, set importedMaxVersion to home version (or default "1.0.0")
+            const homeItem = docData.find((item) => item.type === "home");
+            importedMaxVersion =
+              homeItem && homeItem.version ? homeItem.version : "1.0.0";
             createDataModal.style.display = "none";
             welcomeScreen.style.display = "none";
             appContainer.style.display = "block";
@@ -837,8 +1148,7 @@
             buildItemMap(docData);
             selectNavItemFromLabel("Home");
           } else {
-            const oldDoc = docData;
-            docData = buildDocDataFromTSV(rawText, oldDoc);
+            docData = buildDocDataFromTSV(rawText, docData);
             createDataModal.style.display = "none";
             buildNavigation();
             buildItemMap(docData);
@@ -859,6 +1169,12 @@
             return;
           }
           docData = docDataParsed;
+          sessionBaseline = JSON.parse(JSON.stringify(docDataParsed));
+          pendingVersion = null;
+          // Set importedMaxVersion from imported document (stored as semantic version string)
+          const homeItem = docData.find((i) => i.type === "home");
+          importedMaxVersion =
+            homeItem && homeItem.version ? homeItem.version : "1.0.0";
           welcomeScreen.style.display = "none";
           appContainer.style.display = "block";
           buildNavigation();
@@ -867,16 +1183,11 @@
         };
         reader.readAsText(file);
       }
-      // Note: We replaced the /s flag with [\s\S] so that dot matches newlines
       function extractDocDataFromHtml(html) {
-        console.log(html);
         const re = /(?:var\s+)?docData\s*=\s*(\[[\s\S]*?\])\s*;/;
         const match = re.exec(html);
-
         if (!match) return null;
-
         try {
-          // Use match[1] to get only the JSON array string
           const dataStr = match[1];
           return JSON.parse(dataStr);
         } catch (e) {
@@ -888,30 +1199,37 @@
       /***********************************************************************
        * 5. BUILD DOC DATA
        ***********************************************************************/
+      // Updated buildDocDataFromTSV now uses the custom parseTSV() function.
+      // IMPORTANT: We now trim only the first three columns (Name, Parent, Type)
+      // and leave the Expression column (which may be multi-line) untrimmed.
       function buildDocDataFromTSV(tsv, oldDocData) {
-        const lines = tsv
-          .split("\n")
-          .map((l) => l.trim())
-          .filter((l) => l);
-        let startIndex = 0;
-        if (lines.length && lines[0].toLowerCase().includes("parent")) {
-          startIndex = 1;
+        // Use parseTSV() to correctly handle multi-line quoted fields.
+        const rows = parseTSV(tsv);
+        // If the header row (containing "parent") is present, remove it.
+        if (
+          rows.length > 0 &&
+          rows[0].join("\t").toLowerCase().includes("parent")
+        ) {
+          rows.shift();
         }
+        const baseData = sessionBaseline || oldDocData;
+        const oldMap = baseData ? docDataToMap(baseData) : {};
         const homeItem = {
           label: "Home",
           type: "home",
-          description: oldDocData
-            ? getOldItemDescFormula(oldDocData, "home", "Home", null)
-                .description
+          description: baseData
+            ? getOldItemDescFormula(baseData, "home", "Home", null).description
             : "Welcome home page. Edit me!",
           formula: null,
+          version: "1.0.0",
+          changelog: [],
           children: [],
         };
         const measuresCat = {
           label: "Measures",
           type: "category",
-          description: oldDocData
-            ? getOldItemDescFormula(oldDocData, "category", "Measures", null)
+          description: baseData
+            ? getOldItemDescFormula(baseData, "category", "Measures", null)
                 .description
             : "Automatically generated measures.",
           formula: null,
@@ -920,28 +1238,55 @@
         const tablesCat = {
           label: "Tables",
           type: "category",
-          description: oldDocData
-            ? getOldItemDescFormula(oldDocData, "category", "Tables", null)
+          description: baseData
+            ? getOldItemDescFormula(baseData, "category", "Tables", null)
                 .description
             : "Automatically generated tables.",
           formula: null,
           children: [],
         };
         const newDocData = [homeItem, measuresCat, tablesCat];
-        const oldMap = oldDocData ? docDataToMap(oldDocData) : {};
-        const measuresMap = {};
-        const tablesMap = {};
-        const dimensionSets = {};
-        function ensureDimSet(tbl) {
-          if (!dimensionSets[tbl]) dimensionSets[tbl] = new Set();
-        }
+        const newDims = {};
         const uniqueKeys = new Set();
-        for (let i = startIndex; i < lines.length; i++) {
-          const parts = lines[i].split("\t").map((x) => x.trim());
-          if (parts.length < 3) continue;
-          const rawName = parts[0];
-          const rawParent = parts[1];
-          const rawType = parts[2].toLowerCase();
+        for (let i = 0; i < rows.length; i++) {
+          // Instead of trimming every column (which removes newlines/indentation),
+          // we trim only Name, Parent and Type. The Expression (column 4) is preserved.
+          const row = rows[i];
+          if (row.length < 3) continue;
+          const rawName = row[0].trim();
+          const rawParent = row[1].trim();
+          const rawType = row[2].trim().toLowerCase();
+          let rawExpression = row.length >= 4 ? row[3] : "";
+          // Remove only the leading and trailing whitespace (but preserve internal newlines)
+          rawExpression = rawExpression.replace(/^\s+|\s+$/g, "");
+          let extractedDescription = "";
+          let extractedFormula = "";
+          if (rawExpression) {
+            // If the expression is quoted, remove the surrounding quotes and unescape inner double quotes.
+            if (
+              (rawExpression.startsWith('"') && rawExpression.endsWith('"')) ||
+              (rawExpression.startsWith("'") && rawExpression.endsWith("'"))
+            ) {
+              rawExpression = rawExpression.substring(
+                1,
+                rawExpression.length - 1
+              );
+              // Replace doubled double quotes with a single double quote.
+              rawExpression = rawExpression.replace(/""/g, '"');
+            }
+            // Extract a description from a comment block /** description **/
+            const descMatch = rawExpression.match(
+              /\/\*\*\s*([\s\S]*?)\s*\*\*\//
+            );
+            if (descMatch) {
+              extractedDescription = descMatch[1].trim();
+              rawExpression = rawExpression
+                .replace(/\/\*\*\s*([\s\S]*?)\s*\*\*\//, "")
+                .trim();
+            }
+            extractedFormula = rawExpression;
+          }
+
           const lineKey =
             rawType +
             "||" +
@@ -950,53 +1295,78 @@
             rawParent.toLowerCase();
           if (uniqueKeys.has(lineKey)) continue;
           uniqueKeys.add(lineKey);
+
           if (rawType === "measure" && rawParent.toLowerCase() === "measures") {
-            if (!measuresMap[rawName]) {
-              const oldItem = oldMap["measure:" + rawName + ":measures"];
-              if (oldItem) {
-                measuresMap[rawName] = oldItem;
+            if (!measuresCat.children.find((m) => m.label === rawName)) {
+              const oldMeasure = oldMap["measure:" + rawName + ":measures"];
+              if (oldMeasure) {
+                // Clone the old item and override if new expression is provided.
+                let newMeasure = cloneItem(oldMeasure);
+                if (extractedFormula) {
+                  newMeasure.formula = extractedFormula;
+                }
+                if (extractedDescription) {
+                  newMeasure.description = extractedDescription;
+                }
+                measuresCat.children.push(newMeasure);
               } else {
-                measuresMap[rawName] = {
+                measuresCat.children.push({
                   label: rawName,
                   type: "measure",
-                  description: "Dummy description for " + rawName,
+                  description: extractedDescription || "No description",
                   formula:
+                    extractedFormula ||
                     "CALCULATE(\n  SUM(Fact_Table[" +
-                    rawName.replace(/\s/g, "_") +
-                    "]),\n  ALL()\n)",
+                      rawName.replace(/\s/g, "_") +
+                      "]),\n  ALL()\n)",
                   children: [],
-                };
+                });
               }
-              measuresCat.children.push(measuresMap[rawName]);
             }
-          } else if (
-            rawType === "table" &&
-            rawParent.toLowerCase() === "tables"
-          ) {
-            if (!tablesMap[rawName]) {
-              const oldItem = oldMap["table:" + rawName + ":tables"];
-              if (oldItem) {
-                tablesMap[rawName] = oldItem;
+          } else if (rawType === "table") {
+            // When a table row is provided, update (if exists) or create a new table entry.
+            let tableObj = tablesCat.children.find(
+              (t) => t.label.toLowerCase() === rawName.toLowerCase()
+            );
+            if (tableObj) {
+              if (extractedFormula) {
+                tableObj.formula = extractedFormula;
+              }
+              if (extractedDescription) {
+                tableObj.description = extractedDescription;
+              }
+            } else {
+              const oldTable = oldMap["table:" + rawName + ":tables"];
+              if (oldTable) {
+                let newTable = cloneItem(oldTable);
+                if (extractedFormula) {
+                  newTable.formula = extractedFormula;
+                }
+                if (extractedDescription) {
+                  newTable.description = extractedDescription;
+                }
+                tablesCat.children.push(newTable);
               } else {
-                tablesMap[rawName] = {
+                tablesCat.children.push({
                   label: rawName,
                   type: "table",
-                  description: "Dummy description for " + rawName,
-                  formula: rawName + " (A standard table).",
+                  description: extractedDescription || "No description",
+                  formula: extractedFormula || rawName + " (A standard table).",
                   children: [],
-                };
+                });
               }
-              ensureDimSet(rawName);
-              tablesCat.children.push(tablesMap[rawName]);
             }
           } else if (rawType === "dimension") {
             const parentTbl = rawParent;
-            if (!tablesMap[parentTbl]) {
-              const oldTbl = oldMap["table:" + parentTbl + ":tables"];
-              if (oldTbl) {
-                tablesMap[parentTbl] = oldTbl;
+            let tableObj = tablesCat.children.find(
+              (t) => t.label === parentTbl
+            );
+            if (!tableObj) {
+              const oldTable = oldMap["table:" + parentTbl + ":tables"];
+              if (oldTable) {
+                tableObj = cloneItem(oldTable);
               } else {
-                tablesMap[parentTbl] = {
+                tableObj = {
                   label: parentTbl,
                   type: "table",
                   description: "Auto-created table for " + parentTbl,
@@ -1004,32 +1374,54 @@
                   children: [],
                 };
               }
-              ensureDimSet(parentTbl);
-              tablesCat.children.push(tablesMap[parentTbl]);
+              tablesCat.children.push(tableObj);
             }
-            ensureDimSet(parentTbl);
-            const dimKeyLower = rawName.toLowerCase();
-            if (!dimensionSets[parentTbl].has(dimKeyLower)) {
+            if (!newDims[parentTbl]) {
+              newDims[parentTbl] = { dims: [], set: new Set() };
+            }
+            if (!newDims[parentTbl].set.has(rawName.toLowerCase())) {
               const oldDim = oldMap["dimension:" + rawName + ":" + parentTbl];
               if (oldDim) {
-                tablesMap[parentTbl].children.push(oldDim);
+                let newDim = cloneItem(oldDim);
+                if (extractedFormula) {
+                  newDim.formula = extractedFormula;
+                }
+                if (extractedDescription) {
+                  newDim.description = extractedDescription;
+                }
+                newDims[parentTbl].dims.push(newDim);
               } else {
-                tablesMap[parentTbl].children.push({
+                newDims[parentTbl].dims.push({
                   label: rawName,
                   type: "dimension",
-                  description: "Dummy description for " + rawName,
+                  description: extractedDescription || "",
                   formula:
+                    extractedFormula ||
                     "RELATED(" +
-                    parentTbl +
-                    "[" +
-                    rawName.replace(/\s/g, "_") +
-                    "])",
+                      parentTbl +
+                      "[" +
+                      rawName.replace(/\s/g, "_") +
+                      "])",
                   children: [],
                 });
               }
-              dimensionSets[parentTbl].add(dimKeyLower);
+              newDims[parentTbl].set.add(rawName.toLowerCase());
             }
           }
+        }
+        tablesCat.children.forEach((tableObj) => {
+          tableObj.children = newDims[tableObj.label]
+            ? newDims[tableObj.label].dims
+            : [];
+        });
+        // Only update the changelog if the document was imported.
+        if (isImported && baseData) {
+          updateChangelogDiff(newDocData, baseData);
+        } else {
+          // For new docs, do not change the version/changelog.
+          homeItem.version = "1.0.0";
+          homeItem.changelog = [];
+          pendingVersion = null;
         }
         return newDocData;
       }
@@ -1062,6 +1454,19 @@
         walk(docArr, null);
         return map;
       }
+      function cloneItem(item) {
+        return {
+          label: item.label,
+          type: item.type,
+          description: item.description,
+          formula: item.formula,
+          version: item.version,
+          changelog: item.changelog
+            ? JSON.parse(JSON.stringify(item.changelog))
+            : undefined,
+          children: item.children ? item.children.map(cloneItem) : [],
+        };
+      }
       function getOldItemDescFormula(oldDocData, type, label, parent) {
         const m = docDataToMap(oldDocData);
         let key = "";
@@ -1079,16 +1484,213 @@
           return { description: "", formula: null };
         }
         if (m[key]) {
-          return {
-            description: m[key].description,
-            formula: m[key].formula,
-          };
+          return { description: m[key].description, formula: m[key].formula };
         }
         return { description: "", formula: null };
       }
 
       /***********************************************************************
-       * 6. BUILD NAVIGATION, SELECT & UPDATE
+       * 6. NEW HELPER: mergeChanges
+       ***********************************************************************/
+      function mergeChanges(existing, newChg) {
+        const merged = {};
+        const keys = new Set([
+          ...(existing ? Object.keys(existing) : []),
+          ...Object.keys(newChg),
+        ]);
+        keys.forEach((key) => {
+          const val1 = existing ? existing[key] : undefined;
+          const val2 = newChg[key];
+          if (Array.isArray(val1) || Array.isArray(val2)) {
+            const arr1 = Array.isArray(val1) ? val1 : [];
+            const arr2 = Array.isArray(val2) ? val2 : [];
+            merged[key] = Array.from(new Set([...arr1, ...arr2]));
+          } else if (typeof val1 === "object" && typeof val2 === "object") {
+            merged[key] = mergeChanges(val1, val2);
+          } else {
+            merged[key] = val2 !== undefined ? val2 : val1;
+          }
+        });
+        return merged;
+      }
+
+      /***********************************************************************
+       * 7. NEW HELPER: Update changelog diff
+       ***********************************************************************/
+      function updateChangelogDiff(newData, baseData) {
+        const baseHome = docDataToMap(baseData)["home:Home:null"];
+        let baseVersion =
+          baseHome && baseHome.version ? baseHome.version : "1.0.0";
+        const oldMapFinal = docDataToMap(baseData);
+        const newMapFinal = docDataToMap(newData);
+        let changes = {};
+
+        let addedMeasures = [];
+        let removedMeasures = [];
+        for (let key in newMapFinal) {
+          if (key.startsWith("measure:") && !oldMapFinal[key]) {
+            addedMeasures.push(newMapFinal[key].label);
+          }
+        }
+        for (let key in oldMapFinal) {
+          if (key.startsWith("measure:") && !newMapFinal[key]) {
+            removedMeasures.push(oldMapFinal[key].label);
+          }
+        }
+        if (addedMeasures.length > 0) changes.addedMeasures = addedMeasures;
+        if (removedMeasures.length > 0)
+          changes.removedMeasures = removedMeasures;
+
+        let addedTables = [];
+        let removedTables = [];
+        for (let key in newMapFinal) {
+          if (key.startsWith("table:") && !oldMapFinal[key]) {
+            addedTables.push(newMapFinal[key].label);
+          }
+        }
+        for (let key in oldMapFinal) {
+          if (key.startsWith("table:") && !newMapFinal[key]) {
+            removedTables.push(oldMapFinal[key].label);
+          }
+        }
+        if (addedTables.length > 0) changes.addedTables = addedTables;
+        if (removedTables.length > 0) changes.removedTables = removedTables;
+
+        let addedDimensions = {};
+        let removedDimensions = {};
+        for (let key in newMapFinal) {
+          if (key.startsWith("dimension:") && !oldMapFinal[key]) {
+            let parts = key.split(":");
+            let table = parts[2];
+            if (!addedDimensions[table]) addedDimensions[table] = [];
+            addedDimensions[table].push(newMapFinal[key].label);
+          }
+        }
+        for (let key in oldMapFinal) {
+          if (key.startsWith("dimension:") && !newMapFinal[key]) {
+            let parts = key.split(":");
+            let table = parts[2];
+            if (removedTables.includes(table)) continue;
+            if (!removedDimensions[table]) removedDimensions[table] = [];
+            removedDimensions[table].push(oldMapFinal[key].label);
+          }
+        }
+        if (Object.keys(addedDimensions).length > 0)
+          changes.addedDimensions = addedDimensions;
+        if (Object.keys(removedDimensions).length > 0)
+          changes.removedDimensions = removedDimensions;
+
+        let updatedMeasures = [];
+        for (let key in newMapFinal) {
+          if (key.startsWith("measure:") && oldMapFinal[key]) {
+            let oldItem = oldMapFinal[key];
+            let newItem = newMapFinal[key];
+            let updates = [];
+            if (oldItem.description !== newItem.description)
+              updates.push("description");
+            if (oldItem.formula !== newItem.formula) updates.push("formula");
+            if (updates.length > 0) {
+              updatedMeasures.push(
+                newItem.label + " (" + updates.join(", ") + ")"
+              );
+            }
+          }
+        }
+        if (updatedMeasures.length > 0)
+          changes.updatedMeasures = updatedMeasures;
+
+        let updatedTables = [];
+        for (let key in newMapFinal) {
+          if (key.startsWith("table:") && oldMapFinal[key]) {
+            let oldItem = oldMapFinal[key];
+            let newItem = newMapFinal[key];
+            let updates = [];
+            if (oldItem.description !== newItem.description)
+              updates.push("description");
+            if (oldItem.formula !== newItem.formula) updates.push("formula");
+            if (updates.length > 0) {
+              updatedTables.push(
+                newItem.label + " (" + updates.join(", ") + ")"
+              );
+            }
+          }
+        }
+        if (updatedTables.length > 0) changes.updatedTables = updatedTables;
+
+        let updatedDimensions = {};
+        for (let key in newMapFinal) {
+          if (key.startsWith("dimension:") && oldMapFinal[key]) {
+            let oldItem = oldMapFinal[key];
+            let newItem = newMapFinal[key];
+            let updates = [];
+            if (oldItem.description !== newItem.description)
+              updates.push("description");
+            if (oldItem.formula !== newItem.formula) updates.push("formula");
+            if (updates.length > 0) {
+              let parts = key.split(":");
+              let table = parts[2];
+              if (!updatedDimensions[table]) updatedDimensions[table] = [];
+              updatedDimensions[table].push(
+                newItem.label + " (" + updates.join(", ") + ")"
+              );
+            }
+          }
+        }
+        if (Object.keys(updatedDimensions).length > 0)
+          changes.updatedDimensions = updatedDimensions;
+
+        let homeItem = newData.find((item) => item.type === "home");
+        if (!homeItem) {
+          homeItem = {
+            label: "Home",
+            type: "home",
+            description: "",
+            formula: null,
+            children: [],
+          };
+          newData.unshift(homeItem);
+        }
+        if (Object.keys(changes).length > 0) {
+          if (pendingVersion === null) {
+            // Set the new pending version by incrementing the base version
+            pendingVersion = incrementVersion(baseVersion);
+          }
+          let newChangelog =
+            baseHome && baseHome.changelog
+              ? JSON.parse(JSON.stringify(baseHome.changelog))
+              : [];
+          if (
+            newChangelog.length > 0 &&
+            newChangelog[newChangelog.length - 1].version === pendingVersion
+          ) {
+            newChangelog[newChangelog.length - 1].changes = mergeChanges(
+              newChangelog[newChangelog.length - 1].changes,
+              changes
+            );
+            newChangelog[newChangelog.length - 1].date =
+              new Date().toISOString();
+            if (!newChangelog[newChangelog.length - 1].author) {
+              newChangelog[newChangelog.length - 1].author = "Unknown";
+            }
+          } else {
+            newChangelog.push({
+              version: pendingVersion,
+              date: new Date().toISOString(),
+              changes: changes,
+              author: "Unknown",
+            });
+          }
+          homeItem.version = pendingVersion;
+          homeItem.changelog = newChangelog;
+        } else {
+          homeItem.version = baseVersion;
+          homeItem.changelog = baseHome ? baseHome.changelog : [];
+          pendingVersion = null;
+        }
+      }
+
+      /***********************************************************************
+       * 8. BUILD NAVIGATION, SELECT & UPDATE
        ***********************************************************************/
       function buildNavigation() {
         navContainer.innerHTML = "";
@@ -1177,11 +1779,10 @@
       }
 
       /***********************************************************************
-       * 7. autoLinkReferences (for description & formulas)
+       * 9. autoLinkReferences (for description & formulas)
        ***********************************************************************/
       function autoLinkReferences(text, currentKey) {
         let output = text;
-        // Dimension pass: TableName[Dimension]
         const dimRegex = /(\b[A-Za-z0-9_]+)\s*\[\s*([A-Za-z0-9_ ]+)\s*\]/g;
         output = replaceWithCallback(output, dimRegex, (full, tbl, dim) => {
           const dimensionKey = "dimension:" + dim + ":" + tbl;
@@ -1200,7 +1801,6 @@
           }
           return full;
         });
-        // Measure pass: [Measure]
         const measureRegex = /\[\s*([^\]]+?)\s*\]/g;
         output = replaceWithCallback(output, measureRegex, (full, mName) => {
           mName = mName.trim();
@@ -1220,13 +1820,11 @@
           }
           return full;
         });
-        // Temporarily protect existing anchors.
         let anchors = [];
         output = output.replace(/<a\b[^>]*>[\s\S]*?<\/a>/g, function (match) {
           anchors.push(match);
           return "{{ANCHOR_" + (anchors.length - 1) + "}}";
         });
-        // Table pass: standalone table names (not followed by '[')
         const tableRegex = /\b([A-Za-z0-9_]+)\b(?!\s*\[)/g;
         output = replaceWithCallback(output, tableRegex, (full, tName) => {
           const tableKey = "table:" + tName + ":tables";
@@ -1266,7 +1864,7 @@
       }
 
       /***********************************************************************
-       * 8. updateContent (view mode)
+       * 10. updateContent (view mode)
        ***********************************************************************/
       function updateContent(item) {
         mainTitleEl.textContent = item.label || "Untitled";
@@ -1299,6 +1897,237 @@
             tr.appendChild(tdD);
             mainTOCBody.appendChild(tr);
           });
+        }
+        if (item.type === "home") {
+          let changelogDiv = document.getElementById("changelog-section");
+          if (!changelogDiv) {
+            changelogDiv = document.createElement("div");
+            changelogDiv.id = "changelog-section";
+            changelogDiv.className = "changelog-section";
+            mainDescEl.parentNode.insertBefore(
+              changelogDiv,
+              mainDescEl.nextSibling
+            );
+          }
+          let changelogHTML = "<h3>Changelog</h3>";
+          if (item.changelog && item.changelog.length > 0) {
+            // Loop from the last (current) entry to the oldest
+            for (let i = item.changelog.length - 1; i >= 0; i--) {
+              let entry = item.changelog[i];
+              // Determine if this entry is editable.
+              // For imported docs, only allow editing of entries created in this session.
+              let editable = true;
+              if (
+                isImported &&
+                compareVersions(entry.version, importedMaxVersion) <= 0
+              ) {
+                editable = false;
+              }
+              changelogHTML +=
+                '<div class="changelog-entry" data-index="' + i + '">';
+              changelogHTML += '<div class="changelog-header">';
+              changelogHTML += '<div class="version-container">';
+              changelogHTML +=
+                '<span class="version-info">Version ' +
+                entry.version +
+                " - " +
+                new Date(entry.date).toLocaleDateString() +
+                "</span>";
+              if (editable) {
+                changelogHTML +=
+                  '<span class="edit-version-icon" data-index="' +
+                  i +
+                  '">&#9998;</span>';
+              }
+              changelogHTML += "</div>";
+              changelogHTML += '<div class="author-container">';
+              changelogHTML +=
+                '<span class="changelog-author">Modified by ' +
+                (entry.author ? entry.author : "Unknown") +
+                "</span>";
+              if (editable) {
+                changelogHTML +=
+                  '<span class="edit-author-icon" data-index="' +
+                  i +
+                  '">&#9998;</span>';
+              }
+              changelogHTML += "</div>";
+              changelogHTML += "</div>";
+              changelogHTML += "<ul>";
+              if (entry.changes.addedMeasures) {
+                changelogHTML +=
+                  '<li class="changelog-addition" data-change-key="addedMeasures">+ Added Measures: ' +
+                  entry.changes.addedMeasures.join(", ");
+                if (editable) {
+                  changelogHTML +=
+                    ' <span class="edit-action-icon" data-change-key="addedMeasures" data-index="' +
+                    i +
+                    '">&#9998;</span>';
+                }
+                changelogHTML += "</li>";
+              }
+              if (entry.changes.removedMeasures) {
+                changelogHTML +=
+                  '<li class="changelog-removal" data-change-key="removedMeasures">– Removed Measures: ' +
+                  entry.changes.removedMeasures.join(", ");
+                if (editable) {
+                  changelogHTML +=
+                    ' <span class="edit-action-icon" data-change-key="removedMeasures" data-index="' +
+                    i +
+                    '">&#9998;</span>';
+                }
+                changelogHTML += "</li>";
+              }
+              if (entry.changes.addedTables) {
+                changelogHTML +=
+                  '<li class="changelog-addition" data-change-key="addedTables">+ Added Tables: ' +
+                  entry.changes.addedTables.join(", ");
+                if (editable) {
+                  changelogHTML +=
+                    ' <span class="edit-action-icon" data-change-key="addedTables" data-index="' +
+                    i +
+                    '">&#9998;</span>';
+                }
+                changelogHTML += "</li>";
+              }
+              if (entry.changes.removedTables) {
+                changelogHTML +=
+                  '<li class="changelog-removal" data-change-key="removedTables">– Removed Tables: ' +
+                  entry.changes.removedTables.join(", ");
+                if (editable) {
+                  changelogHTML +=
+                    ' <span class="edit-action-icon" data-change-key="removedTables" data-index="' +
+                    i +
+                    '">&#9998;</span>';
+                }
+                changelogHTML += "</li>";
+              }
+              if (entry.changes.addedDimensions) {
+                for (let tbl in entry.changes.addedDimensions) {
+                  changelogHTML +=
+                    '<li class="changelog-addition" data-change-key="addedDimensions" data-table="' +
+                    tbl +
+                    '">+ Added Dimensions to ' +
+                    tbl +
+                    ": " +
+                    entry.changes.addedDimensions[tbl].join(", ");
+                  if (editable) {
+                    changelogHTML +=
+                      ' <span class="edit-action-icon" data-change-key="addedDimensions" data-table="' +
+                      tbl +
+                      '" data-index="' +
+                      i +
+                      '">&#9998;</span>';
+                  }
+                  changelogHTML += "</li>";
+                }
+              }
+              if (entry.changes.removedDimensions) {
+                for (let tbl in entry.changes.removedDimensions) {
+                  changelogHTML +=
+                    '<li class="changelog-removal" data-change-key="removedDimensions" data-table="' +
+                    tbl +
+                    '">– Removed Dimensions from ' +
+                    tbl +
+                    ": " +
+                    entry.changes.removedDimensions[tbl].join(", ");
+                  if (editable) {
+                    changelogHTML +=
+                      ' <span class="edit-action-icon" data-change-key="removedDimensions" data-table="' +
+                      tbl +
+                      '" data-index="' +
+                      i +
+                      '">&#9998;</span>';
+                  }
+                  changelogHTML += "</li>";
+                }
+              }
+              if (entry.changes.updatedMeasures) {
+                changelogHTML +=
+                  '<li class="changelog-update" data-change-key="updatedMeasures">~ Updated Measures: ' +
+                  entry.changes.updatedMeasures.join(", ");
+                if (editable) {
+                  changelogHTML +=
+                    ' <span class="edit-action-icon" data-change-key="updatedMeasures" data-index="' +
+                    i +
+                    '">&#9998;</span>';
+                }
+                changelogHTML += "</li>";
+              }
+              if (entry.changes.updatedTables) {
+                changelogHTML +=
+                  '<li class="changelog-update" data-change-key="updatedTables">~ Updated Tables: ' +
+                  entry.changes.updatedTables.join(", ");
+                if (editable) {
+                  changelogHTML +=
+                    ' <span class="edit-action-icon" data-change-key="updatedTables" data-index="' +
+                    i +
+                    '">&#9998;</span>';
+                }
+                changelogHTML += "</li>";
+              }
+              if (entry.changes.updatedDimensions) {
+                for (let tbl in entry.changes.updatedDimensions) {
+                  changelogHTML +=
+                    '<li class="changelog-update" data-change-key="updatedDimensions" data-table="' +
+                    tbl +
+                    '">~ Updated Dimensions in ' +
+                    tbl +
+                    ": " +
+                    entry.changes.updatedDimensions[tbl].join(", ");
+                  if (editable) {
+                    changelogHTML +=
+                      ' <span class="edit-action-icon" data-change-key="updatedDimensions" data-table="' +
+                      tbl +
+                      '" data-index="' +
+                      i +
+                      '">&#9998;</span>';
+                  }
+                  changelogHTML += "</li>";
+                }
+              }
+              changelogHTML += "</ul>";
+              changelogHTML += "</div>";
+            }
+          } else {
+            changelogHTML +=
+              '<div class="changelog-entry"><em>No changes logged yet.</em></div>';
+          }
+          changelogDiv.innerHTML = changelogHTML;
+          const editVersionIcons =
+            changelogDiv.querySelectorAll(".edit-version-icon");
+          editVersionIcons.forEach((icon) => {
+            icon.addEventListener("click", (e) => {
+              let index = icon.getAttribute("data-index");
+              openVersionEditModal(item, index);
+              e.stopPropagation();
+            });
+          });
+          const editActionIcons =
+            changelogDiv.querySelectorAll(".edit-action-icon");
+          editActionIcons.forEach((icon) => {
+            icon.addEventListener("click", (e) => {
+              let index = icon.getAttribute("data-index");
+              let changeKey = icon.getAttribute("data-change-key");
+              let table = icon.getAttribute("data-table");
+              openActionEditModal(index, changeKey, table);
+              e.stopPropagation();
+            });
+          });
+          const editAuthorIcons =
+            changelogDiv.querySelectorAll(".edit-author-icon");
+          editAuthorIcons.forEach((icon) => {
+            icon.addEventListener("click", (e) => {
+              let index = icon.getAttribute("data-index");
+              openAuthorEditModal(item, index);
+              e.stopPropagation();
+            });
+          });
+        } else {
+          let changelogDiv = document.getElementById("changelog-section");
+          if (changelogDiv) {
+            changelogDiv.innerHTML = "";
+          }
         }
       }
       function wireDocLinks(container) {
@@ -1339,9 +2168,8 @@
       }
 
       /***********************************************************************
-       * 9. EDIT ITEM (Modal) with Enhanced Editors for Description & Formula
+       * 11. EDIT ITEM (Modal) with Enhanced Editors for Description & Formula
        ***********************************************************************/
-      // --- Description editor update ---
       function updateDescriptionHighlight() {
         let raw = editDescTextarea.value;
         let highlighted = autoLinkReferences(
@@ -1350,7 +2178,6 @@
         );
         editDescHighlight.innerHTML = highlighted;
       }
-      // --- Formula editor update using Prism highlighting ---
       function updateFormulaHighlight() {
         let raw = editFormulaTextarea.value;
         let temp = document.createElement("code");
@@ -1359,7 +2186,6 @@
         Prism.highlightElement(temp);
         editFormulaHighlight.innerHTML = temp.innerHTML;
       }
-      // --- Slash command detection in description editor ---
       function checkForSlashCommand() {
         let value = editDescTextarea.value;
         let pos = editDescTextarea.selectionStart;
@@ -1373,7 +2199,6 @@
           hideSlashModal();
         }
       }
-      // --- Show slash modal ---
       function showSlashModal(query) {
         let containerRect = document
           .getElementById("edit-description-container")
@@ -1417,7 +2242,7 @@
         if (item.type === "measure") return "[" + item.label + "]";
         if (item.type === "table") return item.label;
         if (item.type === "dimension") {
-          let parts = item.__key.split(":"); // format: dimension:DimensionName:ParentTable
+          let parts = item.__key.split(":");
           return parts[2] + "[" + parts[1] + "]";
         }
         return item.label;
@@ -1500,12 +2325,151 @@
           }
           updateContent(currentItem);
           buildItemMap(docData);
+          // Only update changelog if the document was imported.
+          if (sessionBaseline && isImported) {
+            updateChangelogDiff(docData, sessionBaseline);
+          }
           modalOverlayEdit.style.display = "none";
         });
       }
 
       /***********************************************************************
-       * 10. EDIT DATA => Re-export as TSV
+       * 12. NEW: Version/Changelog Edit Modal functions
+       ***********************************************************************/
+      function openVersionEditModal(homeItem, index) {
+        currentHomeItem = homeItem;
+        currentChangelogIndex = index;
+        const entry = homeItem.changelog[index];
+        let versionStr = entry.version.toString();
+        const parts = versionStr.split(".");
+        versionMajorInput.value = parts[0] || 1;
+        versionMinorInput.value = parts[1] || 0;
+        versionPatchInput.value = parts[2] || 0;
+        modalOverlayVersion.style.display = "flex";
+      }
+      btnCancelVersion.addEventListener("click", () => {
+        modalOverlayVersion.style.display = "none";
+      });
+      btnSaveVersion.addEventListener("click", () => {
+        if (currentHomeItem && currentChangelogIndex !== null) {
+          const major = parseInt(versionMajorInput.value.trim(), 10);
+          const minor = parseInt(versionMinorInput.value.trim(), 10);
+          const patch = parseInt(versionPatchInput.value.trim(), 10);
+          if (isNaN(major) || isNaN(minor) || isNaN(patch)) {
+            alert(
+              "Please enter valid version numbers for major, minor, and patch."
+            );
+            return;
+          }
+          const newVersion = major + "." + minor + "." + patch;
+          // Determine the baseline version. If editing the first entry after import,
+          // the baseline is importedMaxVersion; otherwise, it is the previous entry’s version.
+          let previousVersion = importedMaxVersion;
+          if (currentHomeItem.changelog && currentChangelogIndex > 0) {
+            previousVersion =
+              currentHomeItem.changelog[currentChangelogIndex - 1].version;
+          }
+          if (compareVersions(newVersion, previousVersion) <= 0) {
+            alert(
+              "New version must be greater than previous version (" +
+                previousVersion +
+                ")."
+            );
+            return;
+          }
+          const entry = currentHomeItem.changelog[currentChangelogIndex];
+          entry.version = newVersion;
+          entry.date = new Date().toISOString();
+          modalOverlayVersion.style.display = "none";
+          updateContent(currentHomeItem);
+        }
+      });
+
+      function openActionEditModal(entryIndex, changeKey, table) {
+        currentActionEntryIndex = entryIndex;
+        currentActionKey = changeKey;
+        currentActionTable = table || null;
+        let homeItem = currentItem;
+        if (!homeItem || homeItem.type !== "home") {
+          homeItem = docData.find((i) => i.type === "home");
+        }
+        // FIX: Set the currentHomeItem so that saving works correctly.
+        currentHomeItem = homeItem;
+        let entry = homeItem.changelog[entryIndex];
+        let actionText = "";
+        if (table) {
+          let arr = entry.changes[changeKey][table];
+          actionText = arr.join(", ");
+        } else {
+          let arr = entry.changes[changeKey];
+          actionText = arr.join(", ");
+        }
+        actionText = actionText.trim();
+        const allowedSymbols = ["+", "–", "~"];
+        let symbol = "";
+        if (allowedSymbols.includes(actionText.charAt(0))) {
+          symbol = actionText.charAt(0);
+          actionText = actionText.slice(1).trim();
+        } else {
+          if (changeKey.startsWith("added")) symbol = "+";
+          else if (changeKey.startsWith("removed")) symbol = "–";
+          else if (changeKey.startsWith("updated")) symbol = "~";
+          else symbol = "";
+        }
+        actionEditPrefix.textContent = symbol;
+        actionEditText.value = actionText;
+        modalOverlayAction.style.display = "flex";
+      }
+      btnCancelActionEdit.addEventListener("click", () => {
+        modalOverlayAction.style.display = "none";
+      });
+      btnSaveActionEdit.addEventListener("click", () => {
+        const prefix = actionEditPrefix.textContent;
+        const text = actionEditText.value;
+        const newActionText = prefix + " " + text;
+        if (
+          currentHomeItem &&
+          currentActionEntryIndex !== null &&
+          currentActionKey
+        ) {
+          let entry = currentHomeItem.changelog[currentActionEntryIndex];
+          if (currentActionTable) {
+            entry.changes[currentActionKey][currentActionTable] = [
+              newActionText,
+            ];
+          } else {
+            entry.changes[currentActionKey] = [newActionText];
+          }
+          entry.date = new Date().toISOString();
+          modalOverlayAction.style.display = "none";
+          updateContent(currentHomeItem);
+        }
+      });
+
+      // NEW: Open the Edit Author modal.
+      function openAuthorEditModal(homeItem, index) {
+        currentHomeItem = homeItem;
+        currentAuthorEntryIndex = index;
+        let entry = homeItem.changelog[index];
+        authorInput.value = entry.author ? entry.author : "Unknown";
+        modalOverlayAuthor.style.display = "flex";
+      }
+      btnCancelAuthor.addEventListener("click", () => {
+        modalOverlayAuthor.style.display = "none";
+      });
+      btnSaveAuthor.addEventListener("click", () => {
+        const newAuthor = authorInput.value.trim() || "Unknown";
+        if (currentHomeItem && currentAuthorEntryIndex !== null) {
+          let entry = currentHomeItem.changelog[currentAuthorEntryIndex];
+          entry.author = newAuthor;
+          entry.date = new Date().toISOString();
+          modalOverlayAuthor.style.display = "none";
+          updateContent(currentHomeItem);
+        }
+      });
+
+      /***********************************************************************
+       * 13. EDIT DATA => Re-export as TSV
        ***********************************************************************/
       if (editDataButton) {
         editDataButton.addEventListener("click", () => {
@@ -1515,22 +2479,59 @@
           createDataModal.style.display = "flex";
         });
       }
+      // Updated export to include 4 columns: Name, Parent, Type, Expression.
+      // When exporting, if a description exists it is prepended as a comment block to the formula.
       function exportDocDataToTSV(arr) {
         let lines = [];
         function walk(items, parentLabel) {
           items.forEach((it) => {
             if (it.type === "home") {
-              // Skip Home
             } else if (it.type === "category") {
               if (it.label === "Measures") walk(it.children, "Measures");
               else if (it.label === "Tables") walk(it.children, "Tables");
             } else if (it.type === "measure") {
-              lines.push(it.label + "\tMeasures\tMeasure");
+              let expr = "";
+              if (it.formula) {
+                expr = it.formula;
+              }
+              if (it.description) {
+                expr = "/**" + it.description + "**/" + expr;
+              }
+              if (!expr.trim()) {
+                expr = "";
+              }
+              // Escape any double quotes by doubling them and then wrap in double quotes.
+              expr = '"' + expr.replace(/"/g, '""') + '"';
+              lines.push(it.label + "\tMeasures\tMeasure\t" + expr);
             } else if (it.type === "table") {
-              lines.push(it.label + "\tTables\tTable");
+              let expr = "";
+              if (it.formula) {
+                expr = it.formula;
+              }
+              if (it.description) {
+                expr = "/**" + it.description + "**/" + expr;
+              }
+              if (!expr.trim()) {
+                expr = "";
+              }
+              expr = '"' + expr.replace(/"/g, '""') + '"';
+              lines.push(it.label + "\tTables\tTable\t" + expr);
               walk(it.children, it.label);
             } else if (it.type === "dimension") {
-              lines.push(it.label + "\t" + (parentLabel || "") + "\tDimension");
+              let expr = "";
+              if (it.formula) {
+                expr = it.formula;
+              }
+              if (it.description) {
+                expr = "/**" + it.description + "**/" + expr;
+              }
+              if (!expr.trim()) {
+                expr = "";
+              }
+              expr = '"' + expr.replace(/"/g, '""') + '"';
+              lines.push(
+                it.label + "\t" + (parentLabel || "") + "\tDimension\t" + expr
+              );
             }
           });
         }
@@ -1539,35 +2540,22 @@
       }
 
       /***********************************************************************
-       * 11. EXPORT BUTTON => Export Read-Only HTML
-       *
-       * When exporting, we insert a snippet that (unless overridden) forces
-       * read-only mode by setting window.isDocumentEditable to false and
-       * hiding editing UI elements. (Navigation and search remain enabled.)
+       * 14. EXPORT BUTTON => Export Read-Only HTML
        ***********************************************************************/
       if (exportButton) {
         exportButton.addEventListener("click", () => {
           if (!isDocumentEditable) return;
-          // Get the current document's HTML as a string.
           let html = document.documentElement.outerHTML;
-
           html = html.replace(
             "var isDocumentEditable = true;",
             "var isDocumentEditable = false;"
           );
-
-          // Insert a snippet that disables editing functionality and re-embeds docData.
-          // The snippet checks if window.isDocumentEditable !== true so that editing
-          // can be re-enabled (for example, via a query parameter or manual edit).
-
-          const embedScript = `\nvar docData = ${JSON.stringify(docData)};`;
-
+          const embedScript =
+            "\nvar docData = " + JSON.stringify(docData) + ";";
           html = html.replace(
             "<\/script>",
             "\n" + embedScript + "\n<\/script>"
           );
-
-          // Create a Blob and download the file.
           const blob = new Blob([html], { type: "text/html" });
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
@@ -1577,11 +2565,13 @@
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
+          sessionBaseline = JSON.parse(JSON.stringify(docData));
+          pendingVersion = null;
         });
       }
 
       /***********************************************************************
-       * 12. SEARCH BOX
+       * 15. SEARCH BOX
        ***********************************************************************/
       if (searchBox) {
         searchBox.addEventListener("input", () => {
@@ -1647,7 +2637,7 @@
       }
 
       /***********************************************************************
-       * 13. Disable Editing in Read-Only Mode on DOMContentLoaded
+       * 16. Disable Editing in Read-Only Mode on DOMContentLoaded
        ***********************************************************************/
       function disableEditing() {
         if (editDataButton) editDataButton.style.display = "none";
