@@ -48,66 +48,9 @@
 
 2. **Generate Metadata with Power Query:**
 
-   Open a new Power BI report and launch Power Query. Run the following M‑code (after updating the port and database ID accordingly):
+   Open a new Power BI report and launch Power Query. Run the provided M‑code in "mcode-for-metadata.txt" file. Close and apply.
 
-   ```m
-   let
-    // Set your connection parameters
-    server = "127.0.0.1:__YOUR_SSASS_PORT_HERE__",
-    databaseID = "__YOUR_DATABASE_UUID_HERE__,
-    
-    // Connect to your SSAS Tabular model
-    Source = AnalysisServices.Databases(server, [ Implementation = "2.0", TypedMeasureColumns = true ]),
-    Database = Source{[Name = databaseID]}[Data],    
-    DebugResults = Value.NativeQuery(Database, "SELECT [ExplicitName], [TableID] FROM $SYSTEM.TMSCHEMA_COLUMNS"),
-
-    // --- Query 1: Retrieve Measures using SQL-like syntax
-    MeasuresQuery = "
-        SELECT 
-            [Name] AS [Name],
-            'Measures' AS [Parent],
-            'Measure' AS [Type],
-            [Expression] AS [Expression]
-        FROM $SYSTEM.TMSCHEMA_MEASURES
-    ",
-    MeasuresRaw = Value.NativeQuery(Database, MeasuresQuery),
-    Measures = Table.TransformColumns(MeasuresRaw, {{"Expression", each if _ = null then "" else _}}),
-    
-    // --- Query 2: Retrieve Calculated Tables using SQL-like syntax
-    TablesQuery = "
-        SELECT 
-            [Name] AS [Name],
-            'Tables' AS [Parent],
-            'Table' AS [Type],
-            [TableID],
-            [QueryDefinition] AS [Expression]
-        FROM $SYSTEM.TMSCHEMA_PARTITIONS
-        WHERE [Type] = '4'
-    ",
-    TablesRaw = Value.NativeQuery(Database, TablesQuery),
-    Tables = Table.RemoveColumns(Table.TransformColumns(TablesRaw, {{"Expression", each if _ = null then "" else _}}), {"TableID"}),
-    
-    // --- Query 3: Retrieve Columns (for dimensions and calculated columns) using SQL-like syntax
-    ColumnsQuery = "
-    SELECT 
-        [ExplicitName] AS [Name],
-        [TableID],
-        'Dimension' AS [Type],
-        [Expression] AS [Expression]
-    FROM $SYSTEM.TMSCHEMA_COLUMNS
-    ",
-    ColumnsRaw = Value.NativeQuery(Database, ColumnsQuery),
-    ColumnsJoinStep1 = Table.NestedJoin(ColumnsRaw, {"TableID"}, TablesRaw, {"TableID"}, "nestedTableData", JoinKind.LeftOuter),
-    ColumnsJoinStep2 = Table.ExpandTableColumn(ColumnsJoinStep1, "nestedTableData", {"Name"}, {"Parent"} ),
-    Columns = Table.RemoveColumns(Table.TransformColumns(ColumnsJoinStep2, {{"Expression", each if _ = null then "" else _}}), {"TableID"}),
-    
-    // Combine the results into one final table
-    FinalFormat = Table.Combine({Measures, Tables, Columns}),
-    #"Filtered Rows" = Table.SelectRows(FinalFormat, each ([Parent] <> null)),
-    #"Filtered Rows1" = Table.SelectRows(#"Filtered Rows", each not Text.Contains([Name], "RowNumber-")) 
-    in
-    #"Filtered Rows1"
-   ```
+   
 ## Generate Documentation from Metadata
 --- 
 1. **Open the Editor:**
