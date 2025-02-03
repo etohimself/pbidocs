@@ -1,0 +1,56 @@
+let
+    // Set your connection parameters
+    server = "127.0.0.1:__YOUR__SSAS__PORT__HERE___",
+    databaseID = "___YOUR__DATABASE__UUID__HERE___",
+    
+    // Connect to your SSAS Tabular model
+    Source = AnalysisServices.Databases(server, [ Implementation = "2.0", TypedMeasureColumns = true ]),
+    Database = Source{[Name = databaseID]}[Data],    
+    DebugResults = Value.NativeQuery(Database, "SELECT [ExplicitName], [TableID] FROM $SYSTEM.TMSCHEMA_COLUMNS"),
+
+    // --- Query 1: Retrieve Measures using SQL-like syntax
+    MeasuresQuery = "
+        SELECT 
+            [Name] AS [Name],
+            'Measures' AS [Parent],
+            'Measure' AS [Type],
+            [Expression] AS [Expression]
+        FROM $SYSTEM.TMSCHEMA_MEASURES
+    ",
+    MeasuresRaw = Value.NativeQuery(Database, MeasuresQuery),
+    Measures = Table.TransformColumns(MeasuresRaw, {{"Expression", each if _ = null then "" else _}}),
+    
+    // --- Query 2: Retrieve Calculated Tables using SQL-like syntax
+    TablesQuery = "
+        SELECT 
+            [Name] AS [Name],
+            'Tables' AS [Parent],
+            'Table' AS [Type],
+            [TableID],
+            [QueryDefinition] AS [Expression]
+        FROM $SYSTEM.TMSCHEMA_PARTITIONS
+        WHERE [Type] = '4'
+    ",
+    TablesRaw = Value.NativeQuery(Database, TablesQuery),
+    Tables = Table.RemoveColumns(Table.TransformColumns(TablesRaw, {{"Expression", each if _ = null then "" else _}}), {"TableID"}),
+    
+    // --- Query 3: Retrieve Columns (for dimensions and calculated columns) using SQL-like syntax
+    ColumnsQuery = "
+    SELECT 
+        [ExplicitName] AS [Name],
+        [TableID],
+        'Dimension' AS [Type],
+        [Expression] AS [Expression]
+    FROM $SYSTEM.TMSCHEMA_COLUMNS
+    ",
+    ColumnsRaw = Value.NativeQuery(Database, ColumnsQuery),
+    ColumnsJoinStep1 = Table.NestedJoin(ColumnsRaw, {"TableID"}, TablesRaw, {"TableID"}, "nestedTableData", JoinKind.LeftOuter),
+    ColumnsJoinStep2 = Table.ExpandTableColumn(ColumnsJoinStep1, "nestedTableData", {"Name"}, {"Parent"} ),
+    Columns = Table.RemoveColumns(Table.TransformColumns(ColumnsJoinStep2, {{"Expression", each if _ = null then "" else _}}), {"TableID"}),
+    
+    // Combine the results into one final table
+    FinalFormat = Table.Combine({Measures, Tables, Columns}),
+    #"Filtered Rows" = Table.SelectRows(FinalFormat, each ([Parent] <> null)),
+    #"Filtered Rows1" = Table.SelectRows(#"Filtered Rows", each not Text.Contains([Name], "RowNumber-"))
+in
+    #"Filtered Rows1"
